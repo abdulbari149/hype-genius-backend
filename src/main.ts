@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
+import validationOptions from './utils/validation-options';
+import { SerializerInterceptor } from './utils/serializer.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,8 +11,12 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+  app.useGlobalInterceptors(new SerializerInterceptor());
+  app.useGlobalPipes(new ValidationPipe(validationOptions));
 
-  app.setGlobalPrefix(config.get('app.prefix'));
+  app.setGlobalPrefix(config.get('app.prefix'), {
+    exclude: ['/'],
+  });
   await app.listen(config.get('app.port'));
 }
 bootstrap();
