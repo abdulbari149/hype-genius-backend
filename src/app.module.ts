@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseProvider from './database/database.provider';
 import { DataSource } from 'typeorm';
 import appConfig from './config/app.config';
+import UserModule from './app/users/user.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import appConfig from './config/app.config';
         return dataSource;
       },
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
