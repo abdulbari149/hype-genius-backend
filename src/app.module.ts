@@ -8,13 +8,14 @@ import * as path from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseProvider from './database/database.provider';
 import { DataSource } from 'typeorm';
+import appConfig from './config/app.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
       envFilePath: path.resolve(__dirname, '../.env'),
-      load: [databaseConfig],
+      load: [databaseConfig, appConfig],
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
