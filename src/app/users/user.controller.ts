@@ -1,4 +1,4 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import UserService from './user.service';
 
 @Controller({
@@ -12,5 +12,11 @@ export default class UserController {
   @Get('/')
   async getUsers() {
     return this.userService.getUsers();
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post()
+  async createUser() {
+    // this.userService.create();
   }
 }
