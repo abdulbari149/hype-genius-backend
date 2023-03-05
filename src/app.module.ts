@@ -8,6 +8,7 @@ import * as path from 'path';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseProvider from './database/database.provider';
 import { DataSource } from 'typeorm';
+import { RolesModule } from './app/roles/roles.module';
 import appConfig from './config/app.config';
 import UserModule from './app/users/user.module';
 
@@ -31,6 +32,7 @@ import UserModule from './app/users/user.module';
       },
     }),
     UserModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
