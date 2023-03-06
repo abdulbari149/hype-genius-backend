@@ -1,20 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  TypeOrmModule,
-  TypeOrmModuleAsyncOptions,
-  TypeOrmModuleOptions,
-  TypeOrmOptionsFactory,
-} from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-
+import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { resolve } from 'path';
 @Injectable()
 export default class DatabaseProvider implements TypeOrmOptionsFactory {
   constructor(private configService: ConfigService) {}
 
-  createTypeOrmOptions(
-    connectionName?: string,
-  ): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
+  createTypeOrmOptions(): TypeOrmModuleOptions | Promise<TypeOrmModuleOptions> {
     return Promise.resolve({
       type: 'postgres',
       database: this.configService.get('database.name'),
@@ -23,11 +15,11 @@ export default class DatabaseProvider implements TypeOrmOptionsFactory {
       username: this.configService.get('database.user'),
       password: this.configService.get('database.password'),
       autoLoadEntities: true,
-      entities: [__dirname + '../app/**/*.entity.{ts,js}'],
+      entities: [resolve(__dirname, '../app/**/**/entities/*.entity.{ts,js}')],
       synchronize: this.configService.get('database.sync'),
       connectTimeoutMS: 1000,
       ssl: false,
+      logging: true,
     });
   }
-
 }
