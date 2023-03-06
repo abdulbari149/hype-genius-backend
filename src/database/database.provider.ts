@@ -19,6 +19,7 @@ export default class DatabaseProvider implements TypeOrmOptionsFactory {
       synchronize: this.configService.get('database.sync'),
       connectTimeoutMS: 1000,
       ssl: false,
+      logging: true,
     });
   }
 }

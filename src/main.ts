@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import validationOptions from './utils/validation-options';
 import { SerializerInterceptor } from './utils/serializer.interceptor';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalInterceptors(new SerializerInterceptor());
   app.useGlobalPipes(new ValidationPipe(validationOptions));
 
