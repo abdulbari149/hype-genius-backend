@@ -11,6 +11,7 @@ import { DataSource } from 'typeorm';
 import { RolesModule } from './app/roles/roles.module';
 import appConfig from './config/app.config';
 import UserModule from './app/users/user.module';
+import AuthModule from './app/auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import UserModule from './app/users/user.module';
     }),
     UserModule,
     RolesModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

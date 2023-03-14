@@ -24,7 +24,7 @@ export default class UserController {
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Post()
+  @Post('/')
   async createUser(@Body() body: CreateUserDto) {
     const result = await this.userService.create(body);
     return new ResponseEntity(result, 'User created successfully');
