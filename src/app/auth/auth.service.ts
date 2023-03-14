@@ -27,36 +27,28 @@ export default class UserService {
   ) {}
 
   public async Login(data: AuthEmailLoginDto) {
-    try {
-      const users: any = await this.userRepository.findOne({
-        where: { email: data.email },
-      });
-      if (!users) {
-        throw new NotFoundException(USER_NOT_EXIST);
-      }
-
-      const password_is_valid = await Comparepassword(
-        data.password,
-        users.password,
-      );
-      if (!password_is_valid) {
-        throw new NotAcceptableException(EMAIL_PASSWORD_INCORRECT);
-      }
-      delete users['password'];
-      const payload = {
-        user_id: users.id,
-        roles: users.role,
-        role_id: users.roleId,
-      };
-      const access_promise = this.jwtHelperService.SignAccessToken(payload);
-      const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
-      const [access_token, refresh_token] = await Promise.all([
-        access_promise,
-        refresh_promise,
-      ]);
-      return { user: users, access_token, refresh_token };
-    } catch (error) {
-      throw error;
+    const user = await this.userRepository.findOne({
+      where: { email: data.email },
+      relations: { role: true },
+    });
+    if (!user) {
+      throw new NotFoundException(USER_NOT_EXIST);
     }
+    if (!(await Comparepassword(data.password, user.password))) {
+      throw new NotAcceptableException(EMAIL_PASSWORD_INCORRECT);
+    }
+    delete user['password'];
+    const payload = {
+      user_id: user.id,
+      role: user.role.role,
+      role_id: user.roleId,
+    };
+    const access_promise = this.jwtHelperService.SignAccessToken(payload);
+    const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
+    const [access_token, refresh_token] = await Promise.all([
+      access_promise,
+      refresh_promise,
+    ]);
+    return { user: user, access_token, refresh_token };
   }
 }

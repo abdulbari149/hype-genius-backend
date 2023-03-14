@@ -13,8 +13,8 @@ export class JwtHelperService {
     private configService: ConfigService,
   ) {}
 
-  public SignAccessToken = async (
-    payload: JwtAccessPayload,
+  public SignAccessToken = async <T extends JwtAccessPayload>(
+    payload: T,
   ): Promise<string> => {
     try {
       return this.jwtService.signAsync(payload, {
