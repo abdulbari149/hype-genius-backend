@@ -1,6 +1,16 @@
+import BusinessChannelsEntity from 'src/app/business/entities/business.channels.entity';
+import BusinessEntity from 'src/app/business/entities/business.entity';
+import ChannelsEntity from 'src/app/channels/entities/channels.entity';
 import { RoleEntity } from 'src/app/roles/entities/role.entity';
 import DefaultEntity from 'src/helpers/default.entity';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  OneToMany,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export default class UserEntity extends DefaultEntity {
@@ -30,4 +40,25 @@ export default class UserEntity extends DefaultEntity {
   @ManyToOne(() => RoleEntity, (r) => r.users)
   @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
   role: RoleEntity;
+
+  @OneToOne(() => BusinessEntity, (b) => b.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  business: BusinessEntity;
+
+  @OneToMany(() => ChannelsEntity, (c) => c.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  channels: ChannelsEntity[];
+
+  @OneToMany(() => BusinessChannelsEntity, (bc) => bc.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  business_channels: BusinessChannelsEntity[];
 }
