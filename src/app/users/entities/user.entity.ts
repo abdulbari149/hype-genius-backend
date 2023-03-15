@@ -41,7 +41,7 @@ export default class UserEntity extends DefaultEntity {
   @JoinColumn({ name: 'role_id', referencedColumnName: 'id' })
   role: RoleEntity;
 
-  @OneToOne(() => BusinessEntity, (b) => b.user, {
+  @OneToOne(() => BusinessEntity, (b) => b.admin, {
     cascade: true,
     onDelete: 'CASCADE',
     eager: true,

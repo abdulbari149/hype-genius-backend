@@ -16,7 +16,7 @@ export default class BusinessEntity extends DefaultEntity {
 
   @OneToOne(() => UserEntity, (u) => u.business)
   @JoinColumn({ name: 'admin_id', referencedColumnName: 'id' })
-  user: UserEntity;
+  admin: UserEntity;
 
   @OneToMany(() => BusinessChannelsEntity, (bc) => bc.business, {
     cascade: true,
