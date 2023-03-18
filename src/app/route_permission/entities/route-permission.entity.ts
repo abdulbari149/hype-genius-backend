@@ -5,11 +5,11 @@ import DefaultEntity from 'src/helpers/default.entity';
 
 @Entity('route_permissions')
 export class RoutePermissionsEntity extends DefaultEntity {
-  @Column()
-  routeId: number;
+  @Column({ name: 'route_id' })
+  route_id: number;
 
-  @Column()
-  roleId: number;
+  @Column({ name: 'role_id' })
+  role_id: number;
 
   @ManyToOne(() => RoutesEntity, (r) => r.route_permissions, {
     onDelete: 'CASCADE',

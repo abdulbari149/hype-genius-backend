@@ -49,8 +49,8 @@ export class RoutesService {
       const routeDetails = await queryRunner.manager.save<RoutesEntity>(route);
       const routePermissions = roles.map((r) => {
         const route_role = new RoutePermissionsEntity();
-        route_role.roleId = r;
-        route_role.routeId = routeDetails.id;
+        route_role.role_id = r;
+        route_role.route_id = routeDetails.id;
         return route_role;
       });
 
