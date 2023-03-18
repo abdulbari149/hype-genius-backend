@@ -1,6 +1,6 @@
 import UserEntity from '../../users/entities/user.entity';
 import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/default.entity';
 import BusinessChannelEntity from './business.channel.entity';
 
 @Entity('business')
