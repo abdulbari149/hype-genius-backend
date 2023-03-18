@@ -80,11 +80,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   private async getRolePermissions(
     role: string,
   ): Promise<Array<{ request_type: string; end_point: string }>> {
-    let permissions = JSON.parse(
-      await this.cacheService.getFromCache(`${role}_permissions`),
-    );
+    const key = `${role}_permissions`;
+    let permissions = JSON.parse(await this.cacheService.getFromCache(key));
     if (!permissions) {
       permissions = await this.roleRepository.GetPermissions(role);
+      await this.cacheService.addToCache(key, JSON.stringify(permissions));
     }
     return permissions;
   }
