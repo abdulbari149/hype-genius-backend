@@ -90,13 +90,13 @@ export default class AuthService {
         where: { adminId: payload.user_id },
         loadEagerRelations: false,
       });
-      Object.assign(payload, { businessId: business.id });
+      Object.assign(payload, { business_id: business.id });
     } else if (user.role.role === ROLES.INFLUENCER) {
       const channel = await this.channelRepository.findOne({
         where: { influencer_id: payload.user_id },
         loadEagerRelations: false,
       });
-      Object.assign(payload, { channelId: channel.id });
+      Object.assign(payload, { channel_id: channel.id });
     }
 
     const { access_token, refresh_token } = await this.generateTokens(payload);
