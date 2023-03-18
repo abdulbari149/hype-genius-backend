@@ -1,17 +1,24 @@
+import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import AuthService from './auth.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
-import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import AuthRegisterBusinessDto from './dto/auth-register-business.dto';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
+import UserEntity from '../users/entities/user.entity';
+import { Public } from 'src/decorators/public.decorator';
 
 @Controller({
   path: '/auth',
@@ -20,12 +27,13 @@ import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
 export default class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('/login')
-  async Login(@Body() data: AuthEmailLoginDto) {
+  async Login(@Req() req: Request, @Body() data: AuthEmailLoginDto) {
     try {
-      const user_info = await this.authService.Login(data);
-      return new ResponseEntity(user_info, 'login successful');
+      const user_info = await this.authService.login(data);
+      return new ResponseEntity(user_info, 'Login successful');
     } catch (error) {
       console.log(error);
       throw error;
@@ -55,5 +63,11 @@ export default class AuthController {
       payload?.businessId,
     );
     return new ResponseEntity(result, 'Influencer Registered Successfully');
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/me')
+  public async Me() {
+    return 0;
   }
 }

@@ -28,11 +28,11 @@ const {
     ERROR: { USER_NOT_EXIST },
   },
   AUTH: {
-    ERROR: { EMAIL_PASSWORD_INCORRECT },
+    ERROR: {},
   },
 } = MESSAGES;
 @Injectable()
-export default class UserService {
+export default class AuthService {
   constructor(
     private dataSource: DataSource,
     @InjectRepository(UserEntity)
@@ -47,18 +47,19 @@ export default class UserService {
     return payload;
   }
 
-  public async Login(data: AuthEmailLoginDto) {
+  async login(data: AuthEmailLoginDto) {
     const user = await this.userRepository.findOne({
       where: { email: data.email },
+      loadEagerRelations: false,
       relations: { role: true },
     });
     if (!user) {
       throw new NotFoundException(USER_NOT_EXIST);
     }
     if (!(await Comparepassword(data.password, user.password))) {
-      throw new NotAcceptableException(EMAIL_PASSWORD_INCORRECT);
+      throw new NotAcceptableException('Password Incorrect');
     }
-    delete user['password'];
+
     const payload = {
       user_id: user.id,
       role: user.role.role,
@@ -114,10 +115,23 @@ export default class UserService {
       });
       const business_data = await query_runner.manager.save(business_entity);
       await query_runner.commitTransaction();
+      const payload = {
+        user_id: user.id,
+        role: user.role.role,
+        role_id: user.roleId,
+        business_id: business_data.id,
+      };
+      const access_promise = this.jwtHelperService.SignAccessToken(payload);
+      const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
+      const [access_token, refresh_token] = await Promise.all([
+        access_promise,
+        refresh_promise,
+      ]);
       return {
         ...user_data,
         password: undefined,
         business: business_data,
+        token: { access_token, refresh_token },
       };
     } catch (error) {
       await query_runner.rollbackTransaction();

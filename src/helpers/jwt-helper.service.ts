@@ -18,8 +18,8 @@ export class JwtHelperService {
   ): Promise<string> => {
     try {
       return this.jwtService.signAsync(payload, {
-        secret: this.configService.get('ACCESS_TOKEN_SECRET'),
-        expiresIn: this.configService.get('ACCESS_TOKEN_EXPIRY'),
+        secret: this.configService.get('jwt.access.secret'),
+        expiresIn: this.configService.get('jwt.access.expiresIn'),
       });
     } catch (error) {
       throw new InternalServerErrorException(SERVER_ERROR);
@@ -31,13 +31,12 @@ export class JwtHelperService {
   ): Promise<string> => {
     try {
       const refresh_token = await this.jwtService.signAsync(payload, {
-        secret: this.configService.get('REFRESH_TOKEN_SECRET'),
-        expiresIn: this.configService.get('REFRESH_TOKEN_EXPIRY'),
+        secret: this.configService.get('jwt.refresh.secret'),
+        expiresIn: this.configService.get('jwt.refresh.expiresIn'),
       });
       return refresh_token;
     } catch (error) {
       throw new InternalServerErrorException(SERVER_ERROR);
     }
   };
-
 }

@@ -1,3 +1,4 @@
+import { RoutePermissionsEntity } from 'src/app/route_permission/entities/route-permission.entity';
 import UserEntity from 'src/app/users/entities/user.entity';
 import DefaultEntity from 'src/helpers/default.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
@@ -19,4 +20,7 @@ export class RoleEntity extends DefaultEntity {
     eager: true,
   })
   users: UserEntity[];
+
+  @OneToMany(() => RoutePermissionsEntity, (rp) => rp.roles, { cascade: true })
+  route_permissions: RoutePermissionsEntity[];
 }

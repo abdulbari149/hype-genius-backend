@@ -1,0 +1,13 @@
+version: '3.0'
+
+services:
+  redis:
+    image: redis/redis-stack:7.0.2-RC1
+    container_name: hype_genius_redis
+    ports:
+      - '6380:6379'
+      - '8088:8001'
+
+volumes:
+  db:
+    driver: local

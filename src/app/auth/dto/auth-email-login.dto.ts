@@ -1,4 +1,4 @@
-import { IsNotEmpty, Validate } from 'class-validator';
+import { IsEmail, IsNotEmpty, Validate } from 'class-validator';
 import { IsExist } from '../../../utils/validators/is-exists.validator';
 import { Transform } from 'class-transformer';
 import { MESSAGES } from '../../../common/messages';
@@ -14,6 +14,8 @@ export class AuthEmailLoginDto {
   @Validate(IsExist, ['users'], {
     message: EMAIL_DOES_NOT_EXIST,
   })
+  @IsNotEmpty()
+  @IsEmail()
   email: string;
 
   @IsNotEmpty()

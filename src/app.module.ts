@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import { IsMultipleExist } from './utils/validators/is-multiple-exist.validator';
+import { JwtHelperService } from 'src/helpers/jwt-helper.service';
+import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,14 +14,23 @@ import { RolesModule } from './app/roles/roles.module';
 import appConfig from './config/app.config';
 import UserModule from './app/users/user.module';
 import AuthModule from './app/auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards/jwt.guard';
+import jwtConfig from './config/jwt.config';
+import { RoutesModule } from './app/routes/routes.module';
+import { RoutePermissionsModule } from './app/route_permission/route-permission.module';
+import { CacheConfigService } from './cache/cache.config';
+import cacheConfig from './config/cache.config';
+import { IsExist } from './utils/validators/is-exists.validator';
+import { IsNotExist } from './utils/validators/is-not-exists.validator';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
       envFilePath: path.resolve(__dirname, '../.env'),
-      load: [databaseConfig, appConfig],
+      load: [databaseConfig, appConfig, jwtConfig, cacheConfig],
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
@@ -33,18 +44,30 @@ import { JwtModule } from '@nestjs/jwt';
         return dataSource;
       },
     }),
-    JwtModule.registerAsync({
-      useFactory(...args) {
-        return Promise.resolve({
-          secret: process.env.JWT_SECRET,
-        });
-      },
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useClass: CacheConfigService,
+      inject: [ConfigService],
     }),
     UserModule,
     RolesModule,
     AuthModule,
+    RoutesModule,
+    RoutePermissionsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    JwtService,
+    JwtHelperService,
+    IsExist,
+    IsNotExist,
+    IsMultipleExist,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
