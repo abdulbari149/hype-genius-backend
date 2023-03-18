@@ -13,7 +13,7 @@ export class RoleRepository extends Repository<RoleEntity> {
       .select(['rt.request_type as request_type', 'rt.end_point as end_point'])
       .innerJoin('r.route_permissions', 'rp')
       .innerJoin('rp.routes', 'rt')
-      .where(`r.name='${role}'`)
+      .where(`r.role='${role}'`)
       .getRawMany();
   }
 }
