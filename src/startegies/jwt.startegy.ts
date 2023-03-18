@@ -84,7 +84,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     let permissions = JSON.parse(await this.cacheService.getFromCache(key));
     if (!permissions) {
       permissions = await this.roleRepository.GetPermissions(role);
-      await this.cacheService.addToCache(key, JSON.stringify(permissions));
+      await this.cacheService.addToCache(
+        key,
+        JSON.stringify(permissions),
+        this.configService.get('cache.permissionsExpiry'),
+      );
     }
     return permissions;
   }

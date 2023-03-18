@@ -19,6 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import UserEntity from '../users/entities/user.entity';
 import { Public } from 'src/decorators/public.decorator';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Controller({
   path: '/auth',
@@ -69,7 +70,7 @@ export default class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Get('/me')
-  public async Me() {
-    return 0;
+  public async Me(@CurrentUser() user: Partial<UserEntity>) {
+    return new ResponseEntity(user);
   }
 }
