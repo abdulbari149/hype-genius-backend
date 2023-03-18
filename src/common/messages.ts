@@ -38,6 +38,18 @@ export const MESSAGES = {
       USER_ALREADY_EXIST: 'User already exists',
     },
   },
+  CURRENCY: {
+    SUCCESS: {},
+    ERROR: {
+      CURRENCY_NOT_FOUND: 'Currency not found',
+    },
+  },
+  BUSINESS_CHANNELS: {
+    SUCCESS: {},
+    ERROR: {
+      BUSINESS_CHANNEL_NOT_FOUND: 'Business channel not found',
+    },
+  },
 };
 export enum ResponseMessage {
   UNAUTHORIZED = 'Unauthorized for request. Token Mismatch.',

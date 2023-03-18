@@ -206,7 +206,7 @@ export default class AuthService {
       const channel_entity = plainToInstance(ChannelEntity, {
         name: data.channelName,
         link: data.channelLink,
-        influencerId: user_data.id,
+        influencer_id: user_data.id,
       });
       const channel_data = await query_runner.manager.save(channel_entity);
       const business_channel_entity = plainToInstance(BusinessChannelEntity, {

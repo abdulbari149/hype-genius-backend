@@ -24,6 +24,9 @@ import { CacheConfigService } from './cache/cache.config';
 import cacheConfig from './config/cache.config';
 import { IsExist } from './utils/validators/is-exists.validator';
 import { IsNotExist } from './utils/validators/is-not-exists.validator';
+import { JwtModule } from '@nestjs/jwt';
+import ContractModule from './app/contract/contract.module';
+import TagsModule from './app/tags/tags.module';
 
 @Module({
   imports: [
@@ -55,6 +58,8 @@ import { IsNotExist } from './utils/validators/is-not-exists.validator';
     AuthModule,
     RoutesModule,
     RoutePermissionsModule,
+    ContractModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [
