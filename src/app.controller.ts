@@ -12,6 +12,7 @@ import { AppService } from './app.service';
 import BusinessEntity from './app/business/entities/business.entity';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { Public } from './decorators/public.decorator';
 
 @Controller()
 export class AppController {
@@ -27,6 +28,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Public()
   @Get('/:business')
   async HandleBusinessURL(
     @Param('business') name: string,
