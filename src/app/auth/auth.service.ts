@@ -37,6 +37,10 @@ export default class AuthService {
     private dataSource: DataSource,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(BusinessEntity)
+    private businessRepository: Repository<BusinessEntity>,
+    @InjectRepository(ChannelEntity)
+    private channelRepository: Repository<ChannelEntity>,
     private jwtHelperService: JwtHelperService,
     private configService: ConfigService,
     private jwtService: JwtService,
@@ -59,12 +63,26 @@ export default class AuthService {
     if (!(await Comparepassword(data.password, user.password))) {
       throw new NotAcceptableException('Password Incorrect');
     }
-
     const payload = {
       user_id: user.id,
       role: user.role.role,
       role_id: user.roleId,
     };
+
+    if (user.role.role === ROLES.BUSINESS_ADMIN) {
+      const business = await this.businessRepository.findOne({
+        where: { adminId: payload.user_id },
+        loadEagerRelations: false,
+      });
+      Object.assign(payload, { businessId: business.id });
+    } else if (user.role.role === ROLES.INFLUENCER) {
+      const channel = await this.channelRepository.findOne({
+        where: { influencer_id: payload.user_id },
+        loadEagerRelations: false,
+      });
+      Object.assign(payload, { channelId: channel.id });
+    }
+
     const access_promise = this.jwtHelperService.SignAccessToken(payload);
     const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
     const [access_token, refresh_token] = await Promise.all([
