@@ -40,6 +40,7 @@ export default class AuthController {
     }
   }
 
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('/business')
   async RegisterBusiness(@Body() data: AuthRegisterBusinessDto) {
@@ -47,6 +48,7 @@ export default class AuthController {
     return new ResponseEntity(result, 'Business Registered successfully');
   }
 
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('/channel/:token')
   async RegisterChannel(
