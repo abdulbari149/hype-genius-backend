@@ -9,5 +9,7 @@ const envValidationSchema = joi.object().keys({
   DB_SYNC: joi.boolean().required(),
   PORT: joi.number().required(),
   API_PREFIX: joi.string().required(),
+  BACKEND_DOMAIN: joi.string().required(),
+  FRONTEND_DOMAIN: joi.string().required(),
 });
 export default envValidationSchema;

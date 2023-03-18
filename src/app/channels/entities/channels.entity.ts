@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import DefaultEntity from 'src/helpers/default.entity';
 import UserEntity from 'src/app/users/entities/user.entity';
-import BusinessChannelsEntity from 'src/app/business/entities/business.channels.entity';
+import BusinessChannelsEntity from 'src/app/business/entities/business.channel.entity';
 
 @Entity('channels')
-export default class ChannelsEntity extends DefaultEntity {
+export default class ChannelEntity extends DefaultEntity {
   @Column({ name: 'name', type: 'varchar', length: 255, nullable: false })
   name: string;
 

@@ -37,9 +37,4 @@ export default class CreateUserDto {
     minUppercase: 1,
   })
   public password: string;
-
-  @Validate(IsExist, ['roles', 'role'])
-  @IsString()
-  @IsNotEmpty()
-  public role: string;
 }

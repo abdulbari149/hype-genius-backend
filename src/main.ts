@@ -17,7 +17,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe(validationOptions));
 
   app.setGlobalPrefix(config.get('app.prefix'), {
-    exclude: ['/'],
+    exclude: ['/', '/:business'],
   });
   await app.listen(config.get('app.port'));
 }

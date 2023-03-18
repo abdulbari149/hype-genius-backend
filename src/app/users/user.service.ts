@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import CreateUserDto from './dto/create-user.dto';
 import { RoleEntity } from '../roles/entities/role.entity';
 import { hash } from 'bcryptjs';
+import ROLES from 'src/constants/roles';
 
 @Injectable()
 export default class UserService {
@@ -22,7 +23,7 @@ export default class UserService {
 
   public async create(data: CreateUserDto) {
     const [role, user, hashedPassword] = await Promise.all([
-      this.roleRepository.findOneBy({ role: data.role }),
+      this.roleRepository.findOneBy({ role: ROLES.SUPER_ADMIN }),
       this.userRepository.findOneBy({ email: data.email }),
       hash(data.password, 10),
     ]);

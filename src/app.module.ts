@@ -12,6 +12,7 @@ import { RolesModule } from './app/roles/roles.module';
 import appConfig from './config/app.config';
 import UserModule from './app/users/user.module';
 import AuthModule from './app/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -30,6 +31,13 @@ import AuthModule from './app/auth/auth.module';
         const dataSource = new DataSource(options);
         await dataSource.initialize();
         return dataSource;
+      },
+    }),
+    JwtModule.registerAsync({
+      useFactory(...args) {
+        return Promise.resolve({
+          secret: process.env.JWT_SECRET,
+        });
       },
     }),
     UserModule,

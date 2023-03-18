@@ -28,6 +28,7 @@ export class IsExist implements ValidatorConstraintInterface {
               : value,
           ...where_options,
         },
+        loadEagerRelations: false
       });
     validationArguments.constraints[0] =
       this.dataSource.getMetadata(repository).givenTableName;

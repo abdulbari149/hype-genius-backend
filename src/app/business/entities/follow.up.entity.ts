@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import DefaultEntity from 'src/helpers/default.entity';
-import BusinessChannelsEntity from './business.channels.entity';
+import BusinessChannelEntity from './business.channel.entity';
 
 @Entity('follow_ups')
 export default class FollowUpEntity extends DefaultEntity {
@@ -15,7 +15,7 @@ export default class FollowUpEntity extends DefaultEntity {
   @Column({ name: 'business_channel_id', type: 'int8', nullable: false })
   business_channel_id: number;
 
-  @ManyToOne(() => BusinessChannelsEntity, (bc) => bc.follow_ups)
+  @ManyToOne(() => BusinessChannelEntity, (bc) => bc.follow_ups)
   @JoinColumn({ name: 'business_channel_id', referencedColumnName: 'id' })
-  business_channels: BusinessChannelsEntity;
+  business_channels: BusinessChannelEntity;
 }

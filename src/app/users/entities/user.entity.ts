@@ -1,4 +1,4 @@
-import BusinessChannelsEntity from 'src/app/business/entities/business.channels.entity';
+import BusinessChannelsEntity from 'src/app/business/entities/business.channel.entity';
 import BusinessEntity from 'src/app/business/entities/business.entity';
 import ChannelsEntity from 'src/app/channels/entities/channels.entity';
 import { RoleEntity } from 'src/app/roles/entities/role.entity';
