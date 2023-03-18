@@ -1,7 +1,7 @@
 import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
 import ChannelEntity from 'src/app/channels/entities/channels.entity';
 import { RoleEntity } from 'src/app/roles/entities/role.entity';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import UserEntity from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -22,6 +22,12 @@ import ROLES from 'src/constants/roles';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import AuthMeResponse from './dto/auth-me-response.dto';
+import AuthLoginResponse from './dto/auth-login-response.dto';
+import AuthRegisterBusinessResponse from './dto/auth-register-business-response.dto';
+import CreateUserDto from '../users/dto/create-user.dto';
+import { JwtAccessPayload } from './auth.interface';
+import AuthRegisterChannelResponse from './dto/auth-register-channel.response.dto';
 
 const {
   USER: {
@@ -49,6 +55,16 @@ export default class AuthService {
   public async validateToken(token: string, secret: string) {
     const payload = await this.jwtService.verifyAsync(token, { secret });
     return payload;
+  }
+
+  public async generateTokens<T extends JwtAccessPayload>(payload: T) {
+    const access_promise = this.jwtHelperService.SignAccessToken(payload);
+    const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
+    const [access_token, refresh_token] = await Promise.all([
+      access_promise,
+      refresh_promise,
+    ]);
+    return { access_token, refresh_token };
   }
 
   async login(data: AuthEmailLoginDto) {
@@ -83,74 +99,96 @@ export default class AuthService {
       Object.assign(payload, { channelId: channel.id });
     }
 
-    const access_promise = this.jwtHelperService.SignAccessToken(payload);
-    const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
-    const [access_token, refresh_token] = await Promise.all([
-      access_promise,
-      refresh_promise,
-    ]);
-    return { user: user, access_token, refresh_token };
+    const { access_token, refresh_token } = await this.generateTokens(payload);
+    return plainToInstance(AuthLoginResponse, {
+      user: {
+        ...user,
+        role: user.role.role,
+      },
+      access_token,
+      refresh_token,
+    });
   }
 
-  public async RegisterBusiness(data: AuthRegisterBusinessDto) {
+  private async createUser(
+    data: CreateUserDto & { role: ROLES },
+    manager: EntityManager,
+  ) {
+    const [user, role, password] = await Promise.all([
+      manager.findOne(UserEntity, {
+        where: { email: data.email },
+        loadEagerRelations: false,
+      }),
+      manager.findOne(RoleEntity, {
+        where: { role: data.role },
+        loadEagerRelations: false,
+      }),
+      hash(data.password, 10),
+    ]);
+    if (user) throw new ConflictException('User already exists');
+    const user_entity = plainToInstance(UserEntity, {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phoneNumber: data.phoneNumber,
+      email: data.email,
+      roleId: role.id,
+      password,
+    });
+    const user_data = await manager.save(user_entity);
+    return { user: user_data, role };
+  }
+
+  public async registerBusiness(data: AuthRegisterBusinessDto) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
       const onboardingLink = `${this.configService.get(
         'app.backendDomain',
       )}/${data.businessName.replace(' ', '').trim()}`;
-      const [user, role, password, business] = await Promise.all([
-        query_runner.manager.findOne(UserEntity, {
-          where: { email: data.email },
-          loadEagerRelations: false,
-        }),
-        query_runner.manager.findOne(RoleEntity, {
-          where: { role: ROLES.BUSINESS_ADMIN },
-          loadEagerRelations: false,
-        }),
-        hash(data.password, 10),
-        query_runner.manager.findOne(BusinessEntity, {
-          where: [{ name: data.businessName }, { onboardingLink }],
-        }),
-      ]);
-      if (user) throw new ConflictException('User already exists');
+      const { user, role } = await this.createUser(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+          role: ROLES.BUSINESS_ADMIN,
+        },
+        query_runner.manager,
+      );
+
+      const business = await query_runner.manager.findOne(BusinessEntity, {
+        where: [{ name: data.businessName }, { onboardingLink }],
+      });
+
       if (business) throw new ConflictException('business already exists');
 
-      const user_entity = plainToInstance(UserEntity, {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
-        email: data.email,
-        roleId: role.id,
-        password,
-      });
-      const user_data = await query_runner.manager.save(user_entity);
       const business_entity = plainToInstance(BusinessEntity, {
         name: data.businessName,
         link: data.businessLink,
-        adminId: user_data.id,
+        adminId: user.id,
         onboardingLink,
       });
       const business_data = await query_runner.manager.save(business_entity);
-      await query_runner.commitTransaction();
       const payload = {
         user_id: user.id,
-        role: user.role.role,
+        role: role.role,
         role_id: user.roleId,
         business_id: business_data.id,
       };
-      const access_promise = this.jwtHelperService.SignAccessToken(payload);
-      const refresh_promise = this.jwtHelperService.SignRefreshToken(payload);
-      const [access_token, refresh_token] = await Promise.all([
-        access_promise,
-        refresh_promise,
-      ]);
-      return {
-        ...user_data,
-        password: undefined,
+      const { access_token, refresh_token } = await this.generateTokens(
+        payload,
+      );
+      await query_runner.commitTransaction();
+      return plainToInstance(AuthRegisterBusinessResponse, {
+        user: {
+          ...user,
+          role: role.role,
+        },
         business: business_data,
-        token: { access_token, refresh_token },
-      };
+        access_token,
+        refresh_token,
+      });
     } catch (error) {
       await query_runner.rollbackTransaction();
       throw error;
@@ -159,23 +197,26 @@ export default class AuthService {
     }
   }
 
-  public async RegisterChannel(
+  public async registerChannel(
     data: AuthRegisterChannelDto,
     businessId: number,
   ) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
-      const [user, role, password, channel, business] = await Promise.all([
-        query_runner.manager.findOne(UserEntity, {
-          where: { email: data.email },
-          loadEagerRelations: false,
-        }),
-        query_runner.manager.findOne(RoleEntity, {
-          where: { role: ROLES.INFLUENCER },
-          loadEagerRelations: false,
-        }),
-        hash(data.password, 10),
+      const { user, role } = await this.createUser(
+        {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+          role: ROLES.BUSINESS_ADMIN,
+        },
+        query_runner.manager,
+      );
+
+      const [channel, business] = await Promise.all([
         query_runner.manager.findOne(ChannelEntity, {
           where: { name: data.channelName },
         }),
@@ -184,9 +225,6 @@ export default class AuthService {
         }),
       ]);
 
-      if (user) {
-        throw new ConflictException('User already exists');
-      }
       if (!business) {
         throw new NotFoundException('business not found');
       }
@@ -194,38 +232,43 @@ export default class AuthService {
         throw new ConflictException('channel already exists');
       }
 
-      const user_entity = plainToInstance(UserEntity, {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        phoneNumber: data.phoneNumber,
-        email: data.email,
-        roleId: role.id,
-        password,
-      });
-      const user_data = await query_runner.manager.save(user_entity);
       const channel_entity = plainToInstance(ChannelEntity, {
         name: data.channelName,
         link: data.channelLink,
-        influencer_id: user_data.id,
+        influencer_id: user.id,
       });
       const channel_data = await query_runner.manager.save(channel_entity);
       const business_channel_entity = plainToInstance(BusinessChannelEntity, {
         businessId: business.id,
         channelId: channel_data.id,
-        userId: user_data.id,
+        userId: user.id,
       });
+
+      const { access_token, refresh_token } = await this.generateTokens({
+        user_id: user.id,
+        role_id: user.roleId,
+        role: role.role,
+        channel_id: channel_data.id,
+      });
+
       await query_runner.manager.save(business_channel_entity);
       await query_runner.commitTransaction();
-      return {
-        ...user_data,
-        password: undefined,
+      return plainToInstance(AuthRegisterChannelResponse, {
+        user,
         channel: channel_data,
-      };
+        access_token,
+        refresh_token,
+      });
     } catch (error) {
       await query_runner.rollbackTransaction();
       throw error;
     } finally {
       await query_runner.release();
     }
+  }
+
+  public async RefreshToken(token: string) {
+    const payload = await this.jwtHelperService.ValidateRefreshToken(token);
+    return await this.generateTokens(payload);
   }
 }

@@ -39,4 +39,17 @@ export class JwtHelperService {
       throw new InternalServerErrorException(SERVER_ERROR);
     }
   };
+
+  public ValidateRefreshToken = async <T extends JwtAccessPayload>(
+    token: string,
+  ): Promise<T> => {
+    try {
+      const payload = this.jwtService.verify<T>(token, {
+        secret: this.configService.get('jwt.refresh.secret'),
+      });
+      return payload;
+    } catch (error) {
+      throw new InternalServerErrorException(SERVER_ERROR);
+    }
+  };
 }

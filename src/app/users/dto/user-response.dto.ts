@@ -1,17 +1,23 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 
 @Exclude({ toClassOnly: true })
-export class ChannelResponse {
+export default class UserResponse {
   @Type(() => Number)
   @Expose()
   id: number;
   @Expose()
-  name: string;
+  firstName: string;
   @Expose()
-  link: string;
+  lastName: string;
+  @Expose()
+  email: string;
+  @Expose()
+  phoneNumber: string;
   @Type(() => Number)
   @Expose()
-  influencer_id: number;
+  roleId: number;
+  @Expose()
+  role: string;
   @Expose()
   createdAt: Date | null;
   @Expose()
