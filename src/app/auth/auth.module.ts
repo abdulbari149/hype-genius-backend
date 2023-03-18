@@ -1,3 +1,4 @@
+import ChannelEntity from 'src/app/channels/entities/channels.entity';
 import { JwtService } from '@nestjs/jwt';
 import UserEntity from '../users/entities/user.entity';
 import { Module, forwardRef } from '@nestjs/common';
@@ -11,10 +12,11 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from 'src/startegies/jwt.startegy';
 import { CacheService } from 'src/helpers/CacheService';
 import { RoleRepository } from '../roles/role.repository';
+import BusinessEntity from '../business/entities/business.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, BusinessEntity, ChannelEntity]),
     forwardRef(() => UserModule),
     PassportModule,
   ],
