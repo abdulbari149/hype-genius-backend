@@ -17,6 +17,9 @@ import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessPayload } from 'src/app/auth/auth.interface';
 import { InjectRepository } from '@nestjs/typeorm';
+import ROLES from 'src/constants/roles';
+import BusinessEntity from 'src/app/business/entities/business.entity';
+import ChannelEntity from 'src/app/channels/entities/channels.entity';
 
 interface JWTPayloadWithExp extends JwtAccessPayload {
   iat: number;
@@ -61,6 +64,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(BusinessEntity)
+    private businessRepository: Repository<BusinessEntity>,
+    @InjectRepository(ChannelEntity)
+    private channelRepository: Repository<ChannelEntity>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -97,8 +104,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const user = await this.userRepository.findOne({
-      where: { id: payload.user_id },
+      where: { id: payload.user_id, roleId: payload.role_id },
       loadEagerRelations: false,
+      relations: { role: true },
     });
 
     if (!user) {
