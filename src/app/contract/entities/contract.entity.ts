@@ -1,6 +1,6 @@
 import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 import CurrencyEntity from '../../currency/entities/currency.entity';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
 
 @Entity('contracts')
@@ -28,7 +28,7 @@ export default class ContractEntity extends DefaultEntity {
   @Column({ name: 'business_channel_id', type: 'int8', nullable: false })
   business_channel_id: number;
 
-  @ManyToOne(() => BusinessChannelEntity, (bc) => bc.contracts)
+  @OneToOne(() => BusinessChannelEntity, (bc) => bc.contract)
   @JoinColumn({ name: 'business_channel_id', referencedColumnName: 'id' })
-  business_channels: BusinessChannelEntity;
+  business_channel: BusinessChannelEntity;
 }

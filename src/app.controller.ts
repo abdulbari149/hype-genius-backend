@@ -13,6 +13,7 @@ import BusinessEntity from './app/business/entities/business.entity';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/public.decorator';
+import { URL } from 'url';
 
 @Controller()
 export class AppController {
@@ -51,10 +52,11 @@ export class AppController {
       { secret: 'thisisabusinesssecret', expiresIn: '2h' },
     );
 
-    res.redirect(
-      `${this.configService.get(
-        'app.frontendDomain',
-      )}/auth/signup/channel?token=${token}`,
+    const url = new URL(
+      `${this.configService.get('app.frontendDomain')}/auth/signup/channel`,
     );
+    url.searchParams.set('token', token);
+    console.log(url.toString());
+    res.redirect(url.toString());
   }
 }

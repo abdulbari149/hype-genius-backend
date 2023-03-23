@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
 import {
@@ -11,14 +12,13 @@ import {
   Param,
   Post,
   Req,
-  UseGuards,
+  Response,
 } from '@nestjs/common';
 import AuthService from './auth.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import AuthRegisterBusinessDto from './dto/auth-register-business.dto';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { Request, Response as ExpressResponse } from 'express';
 import UserEntity from '../users/entities/user.entity';
 import { Public } from 'src/decorators/public.decorator';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
@@ -29,26 +29,48 @@ import AuthMeResponse from './dto/auth-me-response.dto';
   version: '1',
 })
 export default class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private configService: ConfigService,
+  ) {}
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('/login')
-  async Login(@Req() req: Request, @Body() data: AuthEmailLoginDto) {
-    try {
-      const result = await this.authService.login(data);
-      return new ResponseEntity(result, 'Login successful');
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+  async Login(
+    @Req() req: Request,
+    @Body() data: AuthEmailLoginDto,
+    @Response() res: ExpressResponse,
+  ) {
+    const result = await this.authService.login(data);
+    res.cookie('refresh-token', result.refresh_token, {
+      httpOnly: true,
+      maxAge: 365 * 60 * 60 * 24,
+      sameSite: 'strict',
+      secure: false,
+      path: '/',
+    });
+    res
+      .status(HttpStatus.OK)
+      .json(new ResponseEntity(result, 'Login successful'));
   }
 
   @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('/business')
-  async RegisterBusiness(@Body() data: AuthRegisterBusinessDto) {
+  async RegisterBusiness(
+    @Body() data: AuthRegisterBusinessDto,
+    @Response() res: ExpressResponse,
+  ) {
     const result = await this.authService.registerBusiness(data);
+    console.log(parseInt(this.configService.get('jwt.refresh.expiresIn'), 10));
+    res.cookie('refresh-token', result.refresh_token, {
+      httpOnly: true,
+      maxAge: 60 * 60,
+      sameSite: 'none',
+      secure: true,
+      path: '/',
+    });
     return new ResponseEntity(result, 'Business Registered successfully');
   }
 
@@ -85,18 +107,18 @@ export default class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
-  @Get('/refresh')
+  @Post('/refresh')
   public async RefreshToken(@Req() req: Request) {
-    const token = req.header['Authorization'];
+    const token = req.headers.authorization;
     if (!token) {
       throw new BadRequestException('Refresh token is required');
     }
     if (typeof token !== 'string' || !token.startsWith('Bearer ')) {
       throw new BadRequestException('Invalid Token');
     }
-    const result = await this.authService.RefreshToken(
+    const access_token = await this.authService.RefreshToken(
       token.replace('Bearer ', ''),
     );
-    return new ResponseEntity(result);
+    return new ResponseEntity({ access_token });
   }
 }

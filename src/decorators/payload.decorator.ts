@@ -1,0 +1,12 @@
+import { CustomRequest } from './../types/index';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
+export const Payload = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest<CustomRequest>();
+    const token = request.headers['authorization'];
+    if (token) {
+      return request.payload;
+    }
+  },
+);

@@ -211,7 +211,7 @@ export default class AuthService {
           email: data.email,
           phoneNumber: data.phoneNumber,
           password: data.password,
-          role: ROLES.BUSINESS_ADMIN,
+          role: ROLES.INFLUENCER,
         },
         query_runner.manager,
       );
@@ -269,6 +269,13 @@ export default class AuthService {
 
   public async RefreshToken(token: string) {
     const payload = await this.jwtHelperService.ValidateRefreshToken(token);
-    return await this.generateTokens(payload);
+    const access_token = await this.jwtHelperService.SignAccessToken({
+      role: payload.role,
+      role_id: payload.role_id,
+      user_id: payload.user_id,
+      business_id: payload?.business_id ?? undefined,
+      channel_id: payload?.channel_id ?? undefined,
+    });
+    return access_token;
   }
 }

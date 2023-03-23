@@ -12,11 +12,11 @@ export default class TagsEntity extends DefaultEntity {
   name: string;
 
   @Column({
-    name: 'colour',
+    name: 'color',
     type: 'varchar',
     nullable: false,
   })
-  colour: string;
+  color: string;
 
   @Column({
     name: 'is_activated',

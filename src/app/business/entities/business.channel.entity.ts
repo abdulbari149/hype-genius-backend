@@ -1,6 +1,13 @@
 import ContractEntity from '../../contract/entities/contract.entity';
 import UserEntity from '../../users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import DefaultEntity from 'src/helpers/default.entity';
 import ChannelsEntity from 'src/app/channels/entities/channels.entity';
 import BusinessEntity from './business.entity';
@@ -38,12 +45,8 @@ export default class BusinessChannelEntity extends DefaultEntity {
   })
   follow_ups: FollowUpEntity[];
 
-  @OneToMany(() => ContractEntity, (c) => c.business_channels, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    eager: true,
-  })
-  contracts: ContractEntity[];
+  @OneToOne(() => ContractEntity, (c) => c.business_channel)
+  contract: ContractEntity;
 
   @OneToMany(() => TagsEntity, (t) => t.business_channels, {
     cascade: true,

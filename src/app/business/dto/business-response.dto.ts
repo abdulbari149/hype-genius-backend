@@ -1,6 +1,6 @@
 import { Exclude, Expose, Type } from 'class-transformer';
 
-@Exclude()
+@Exclude({ toClassOnly: true })
 export class BusinessResponse {
   @Type(() => Number)
   @Expose()
@@ -10,7 +10,7 @@ export class BusinessResponse {
   @Expose()
   link: string;
   @Expose()
-  onboarding_link: string;
+  onboardingLink: string;
   @Type(() => Number)
   @Expose()
   adminId: number;

@@ -1,3 +1,4 @@
+import { CustomRequest } from './../types/index';
 import UserEntity from 'src/app/users/entities/user.entity';
 import { RoleRepository } from './../app/roles/role.repository';
 /* eslint-disable prettier/prettier */
@@ -94,7 +95,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  async validate(req: Request, payload: JWTPayloadWithExp) {
+  async validate(req: CustomRequest, payload: JWTPayloadWithExp) {
     const { method, params, originalUrl } = req;
     if (!method_types.includes(method)) {
       throw new MethodNotAllowedException(
@@ -127,6 +128,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
+    req.payload = payload;
 
     return user;
   }

@@ -12,7 +12,7 @@ export class CreateTagsDto {
   name: string;
 
   @IsString()
-  colour: string;
+  color: string;
 
   @IsBoolean()
   is_activated: boolean;
