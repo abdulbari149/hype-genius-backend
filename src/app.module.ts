@@ -27,6 +27,8 @@ import { IsNotExist } from './utils/validators/is-not-exists.validator';
 import { JwtModule } from '@nestjs/jwt';
 import ContractModule from './app/contract/contract.module';
 import TagsModule from './app/tags/tags.module';
+import BusinessModule from './app/business/business.module';
+import VideosModule from './app/videos/videos.module';
 
 @Module({
   imports: [
@@ -60,6 +62,8 @@ import TagsModule from './app/tags/tags.module';
     RoutePermissionsModule,
     ContractModule,
     TagsModule,
+    BusinessModule,
+    VideosModule,
   ],
   controllers: [AppController],
   providers: [
