@@ -1,3 +1,4 @@
+import { NotesRepository } from './../notes/notes.repository';
 import { JwtAccessPayload } from './../../../dist/auth.interface.d';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -10,9 +11,11 @@ import VideosEntity from './entities/videos.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
 import BusinessChannelEntity from '../business/entities/business.channel.entity';
-import BusinessEntity from 'src/app/business/entities/business.entity';
-import ChannelEntity from 'src/app/channels/entities/channels.entity';
 import { VideosResponseDto } from './dto/videos-response.dto';
+import AddNoteDto from './dto/add-note.dto';
+import { NotesEntity } from '../notes/entities/notes.entity';
+import { VideoNotesEntity } from '../notes/entities/video_notes.entity';
+import { NotesResponse } from '../notes/dto/notes-response.dto';
 @Injectable()
 export default class VideosService {
   constructor(
@@ -85,5 +88,73 @@ export default class VideosService {
       relations: { payments: true },
     });
     return plainToInstance(VideosResponseDto, video_data);
+  }
+
+  public async addNote(
+    body: AddNoteDto,
+    video_id: number,
+    payload: JwtAccessPayload,
+  ) {
+    const query_runner = this.dataSource.createQueryRunner();
+    try {
+      await query_runner.startTransaction();
+      const businessChannel = await query_runner.manager.findOne(
+        BusinessChannelEntity,
+        {
+          where: {
+            channelId: payload.channel_id,
+            userId: payload.user_id,
+          },
+          loadEagerRelations: false,
+        },
+      );
+      if (!businessChannel)
+        throw new NotFoundException(
+          'The business is not associated with your channel',
+        );
+      const video = await query_runner.manager.findOne(VideosEntity, {
+        where: {
+          id: video_id,
+          business_channel_id: businessChannel.id,
+        },
+        loadEagerRelations: true,
+      });
+
+      if (!video) throw new NotFoundException('Video doesnt exists');
+
+      const note_entity = plainToInstance(NotesEntity, { body: body.body });
+      const note = await query_runner.manager.save(note_entity);
+      const video_note_entity = plainToInstance(VideoNotesEntity, {
+        video_id: video.id,
+        note_id: note.id,
+      });
+      await query_runner.manager.save(video_note_entity);
+      await query_runner.commitTransaction();
+      return plainToInstance(NotesResponse, note);
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      throw error;
+    } finally {
+      await query_runner.release();
+    }
+  }
+
+  public async getNotes(video_id: number, payload: JwtAccessPayload) {
+    const query = this.dataSource
+      .createQueryBuilder()
+      .select([
+        'n.body as body',
+        'n.id as id',
+        'n.created_at as "createdAt"',
+        'n.updated_at as "updatedAt"',
+        'n.deleted_at as "deletedAt"',
+      ])
+      .from(NotesEntity, 'n')
+      .innerJoin('n.video_notes', 'vn')
+      .where('vn.video_id=:video_id AND n.deleted_at IS NULL', { video_id })
+      .orderBy('n.created_at', 'DESC');
+    const data = await query.getRawMany();
+    console.log(data)
+    return plainToInstance(NotesResponse, data);
   }
 }

@@ -1,4 +1,3 @@
-import { JwtAccessPayload } from './../../../dist/auth.interface.d';
 import { CustomRequest } from './../../types/index';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import {
@@ -12,12 +11,15 @@ import {
   Query,
   BadRequestException,
   ParseIntPipe,
+  Param,
 } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import VideosService from './videos.service';
 import { Payload } from 'src/decorators/payload.decorator';
 import { DataSource } from 'typeorm';
 import ROLES from 'src/constants/roles';
+import AddNoteDto from './dto/add-note.dto';
+import { JwtAccessPayload } from '../auth/auth.interface';
 
 @Controller({
   path: '/videos',
@@ -56,5 +58,36 @@ export default class VideosController {
 
     const result = await this.videosService.getVideos(id, payload);
     return new ResponseEntity(result, `Video Uploads List`);
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/:id/note')
+  async addNote(
+    @Body() data: AddNoteDto,
+    @Req() req: CustomRequest,
+    @Param('id', ParseIntPipe) id: number,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const result = this.videosService.addNote(data, id, payload);
+    return new ResponseEntity(
+      result,
+      'Note added successfully',
+      HttpStatus.CREATED,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/:id/note')
+  async getNotes(
+    @Req() req: CustomRequest,
+    @Param('id', ParseIntPipe) videoId: number,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const result = await this.videosService.getNotes(videoId, payload);
+    return new ResponseEntity(
+      result,
+      `Notes for video ${videoId}`,
+      HttpStatus.OK,
+    );
   }
 }
