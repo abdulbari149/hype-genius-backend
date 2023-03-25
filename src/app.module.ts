@@ -29,6 +29,7 @@ import ContractModule from './app/contract/contract.module';
 import TagsModule from './app/tags/tags.module';
 import BusinessModule from './app/business/business.module';
 import VideosModule from './app/videos/videos.module';
+import { NotesModule } from './app/notes/notes.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import VideosModule from './app/videos/videos.module';
     TagsModule,
     BusinessModule,
     VideosModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [

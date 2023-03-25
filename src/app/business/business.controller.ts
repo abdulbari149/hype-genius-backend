@@ -1,4 +1,4 @@
-import { JwtAccessPayload } from './../../../dist/auth.interface.d';
+import { JwtAccessPayload } from '../auth/auth.interface';
 import { CustomRequest } from './../../types/index';
 import {
   BadRequestException,

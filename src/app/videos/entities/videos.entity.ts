@@ -1,7 +1,8 @@
 import BusinessChannelEntity from '../../business/entities/business.channel.entity';
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
 import PaymentsEntity from 'src/app/payments/entities/payments.entity';
+import { VideoNotesEntity } from 'src/app/notes/entities/video_notes.entity';
 
 @Entity('videos')
 export default class VideosEntity extends DefaultEntity {
@@ -40,10 +41,17 @@ export default class VideosEntity extends DefaultEntity {
   @JoinColumn({ name: 'payment_id', referencedColumnName: 'id' })
   payments: PaymentsEntity;
 
-  @Column({ name: 'business_channel_id', nullable: false })
+  @Column({ name: 'business_channel_id', type: 'integer', nullable: false })
   business_channel_id: number;
 
   @ManyToOne(() => BusinessChannelEntity, (bc) => bc.videos)
   @JoinColumn({ name: 'business_channel_id', referencedColumnName: 'id' })
   business_channels: BusinessChannelEntity;
+
+  @OneToMany(() => VideoNotesEntity, (v) => v.videos, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  video_notes: VideoNotesEntity[];
 }

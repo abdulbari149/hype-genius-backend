@@ -14,6 +14,7 @@ import BusinessEntity from './business.entity';
 import FollowUpEntity from './follow.up.entity';
 import TagsEntity from 'src/app/tags/entities/tags.entity';
 import VideosEntity from 'src/app/videos/entities/videos.entity';
+import { BusinessChannelNotesEntity } from 'src/app/notes/entities/business_channel_notes.entity';
 
 @Entity('business_channel')
 export default class BusinessChannelEntity extends DefaultEntity {
@@ -51,14 +52,19 @@ export default class BusinessChannelEntity extends DefaultEntity {
   @OneToMany(() => TagsEntity, (t) => t.business_channels, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   tags: TagsEntity[];
 
   @OneToMany(() => VideosEntity, (v) => v.business_channels, {
     cascade: true,
     onDelete: 'CASCADE',
-    eager: true,
   })
   videos: VideosEntity[];
+
+  @OneToMany(() => BusinessChannelNotesEntity, (v) => v.business_channels, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  business_channel_notes: BusinessChannelNotesEntity[];
 }
