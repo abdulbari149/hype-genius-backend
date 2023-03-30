@@ -30,27 +30,27 @@ export class AppController {
   }
 
   @Public()
-  @Get('/:business')
-  async HandleBusinessURL(
-    @Param('business') name: string,
+  @Get('/:code')
+  async handleOnboardingURL(
+    @Param('code') code: string,
     @Req() req: Request,
     @Res() res: Response,
   ) {
-    const onboardingLink = `${this.configService.get(
-      'app.backendDomain',
-    )}/${name}`;
+    const [
+      [isBusinessURL, businessPayload],
+      [isOnboardingURL, onboardingPayload],
+    ] = await Promise.all([
+      this.appService.isBusinesOnboardingURL(code),
+      this.appService.isOnboardingRequestURL(code),
+    ]);
+    let payload = {};
+    if (isBusinessURL) payload = businessPayload;
+    else if (isOnboardingURL) payload = onboardingPayload;
 
-    const business = await this.dataSource
-      .getRepository(BusinessEntity)
-      .findOne({ where: [{ name }, { onboardingLink }] });
-
-    if (!business) {
-      throw new NotFoundException('Invalid URI');
-    }
-    const token = await this.jwtService.signAsync(
-      { businessId: business.id },
-      { secret: 'thisisabusinesssecret', expiresIn: '2h' },
-    );
+    const token = await this.jwtService.signAsync(payload, {
+      secret: 'thisisabusinesssecret',
+      expiresIn: '2h',
+    });
 
     const url = new URL(
       `${this.configService.get('app.frontendDomain')}/auth/signup/channel`,
