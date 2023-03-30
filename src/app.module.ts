@@ -30,6 +30,9 @@ import TagsModule from './app/tags/tags.module';
 import BusinessModule from './app/business/business.module';
 import VideosModule from './app/videos/videos.module';
 import { NotesModule } from './app/notes/notes.module';
+import { AlertsSeeder } from './seeders/alerts.seeder';
+import ChannelModule from './app/channels/channels.module';
+import CurrencyModule from './app/currency/currency.module';
 
 @Module({
   imports: [
@@ -65,6 +68,8 @@ import { NotesModule } from './app/notes/notes.module';
     TagsModule,
     BusinessModule,
     VideosModule,
+    ChannelModule,
+    CurrencyModule,
     NotesModule,
   ],
   controllers: [AppController],
@@ -75,10 +80,17 @@ import { NotesModule } from './app/notes/notes.module';
     IsExist,
     IsNotExist,
     IsMultipleExist,
+    AlertsSeeder,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private readonly alertsSeeder: AlertsSeeder) {}
+
+  async onModuleInit() {
+    await this.alertsSeeder.seed();
+  }
+}
