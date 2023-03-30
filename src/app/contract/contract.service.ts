@@ -23,6 +23,7 @@ export default class ContractService {
       await query_runner.commitTransaction();
       return response;
     } catch (error) {
+      await query_runner.rollbackTransaction();
       throw error;
     } finally {
       await query_runner.release();
@@ -45,6 +46,7 @@ export default class ContractService {
       await query_runner.commitTransaction();
       return response;
     } catch (error) {
+      await query_runner.rollbackTransaction();
       throw error;
     } finally {
       await query_runner.release();
@@ -52,13 +54,9 @@ export default class ContractService {
   }
 
   public async GetContract(business_channel_id: number) {
-    try {
-      const contract = await this.contractRepository.findOne({
-        where: { business_channel_id },
-      });
-      return contract;
-    } catch (error) {
-      throw error;
-    }
+    const contract = await this.contractRepository.findOne({
+      where: { business_channel_id },
+    });
+    return contract;
   }
 }
