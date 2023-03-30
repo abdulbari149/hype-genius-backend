@@ -2,6 +2,7 @@ import BusinessChannelEntity from '../../business/entities/business.channel.enti
 import CurrencyEntity from '../../currency/entities/currency.entity';
 import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
+import { UploadFrequencies } from 'src/constants/upload_frequencies';
 
 @Entity('contracts')
 export default class ContractEntity extends DefaultEntity {
@@ -12,7 +13,13 @@ export default class ContractEntity extends DefaultEntity {
   })
   is_one_time: boolean;
 
-  @Column({ name: 'upload_frequency', type: 'int8', nullable: false })
+  @Column({
+    name: 'upload_frequency',
+    type: 'varchar',
+    enum: Object.values(UploadFrequencies),
+    enumName: 'upload_frequency_enum',
+    nullable: false,
+  })
   upload_frequency: number;
 
   @Column({ name: 'amount', type: 'float', nullable: false })
