@@ -86,10 +86,7 @@ export default class AuthController {
       'thisisabusinesssecret',
     );
     if (!payload.businessId) throw new ForbiddenException('Malformed Token');
-    const result = await this.authService.registerChannel(
-      data,
-      payload?.businessId,
-    );
+    const result = await this.authService.registerChannel(data, payload);
     return new ResponseEntity(result, 'Influencer Registered Successfully');
   }
 

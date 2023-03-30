@@ -1,3 +1,4 @@
+import ContractEntity from 'src/app/contract/entities/contract.entity';
 import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
 import ChannelEntity from 'src/app/channels/entities/channels.entity';
 import { RoleEntity } from 'src/app/roles/entities/role.entity';
@@ -5,6 +6,7 @@ import { Repository, DataSource, EntityManager } from 'typeorm';
 import UserEntity from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotAcceptableException,
@@ -28,6 +30,15 @@ import AuthRegisterBusinessResponse from './dto/auth-register-business-response.
 import CreateUserDto from '../users/dto/create-user.dto';
 import { JwtAccessPayload } from './auth.interface';
 import AuthRegisterChannelResponse from './dto/auth-register-channel.response.dto';
+import { AlertsEntity } from '../alerts/entities/alerts.entity';
+import { Alerts } from 'src/constants/alerts';
+import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
+import OnboardRequestsEntity, {
+  OnboardRequestsData,
+} from '../channels/entities/onboard_requests.entity';
+import { pick } from 'src/utils/pick';
+import { NotesEntity } from '../notes/entities/notes.entity';
+import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
 
 const {
   USER: {
@@ -87,7 +98,7 @@ export default class AuthService {
 
     if (user.role.role === ROLES.BUSINESS_ADMIN) {
       const business = await this.businessRepository.findOne({
-        where: { adminId: payload.user_id },
+        where: { admin_id: payload.user_id },
         loadEagerRelations: false,
       });
       Object.assign(payload, { business_id: business.id });
@@ -166,7 +177,7 @@ export default class AuthService {
       const business_entity = plainToInstance(BusinessEntity, {
         name: data.businessName,
         link: data.businessLink,
-        adminId: user.id,
+        admin_id: user.id,
         onboardingLink,
       });
       const business_data = await query_runner.manager.save(business_entity);
@@ -197,9 +208,52 @@ export default class AuthService {
     }
   }
 
+  private validatOnboardingData(data: OnboardRequestsData) {
+    const fields = [
+      'amount',
+      'currency_id',
+      'is_one_time',
+      'upload_frequency',
+    ] as const;
+
+    if (!data || !data.contract)
+      throw new NotFoundException(
+        'Onboard URL may be expired or changed. Please request a new onboarding url',
+      );
+
+    if (!fields.every((key) => Object.keys(data.contract).includes(key))) {
+      throw new BadRequestException(
+        'Onboard URL has some malformed data. Please request a new onboarding url',
+      );
+    }
+  }
+
+  private async onboardChannel(
+    manager: EntityManager,
+    onboarding_id: number,
+    business_channel_id: number,
+  ) {
+    const onboarding = await manager.findOne(OnboardRequestsEntity, {
+      where: { id: onboarding_id },
+    });
+    this.validatOnboardingData(onboarding.data);
+    const { note = '', ...contract_data } = onboarding.data.contract;
+    Object.assign(contract_data, { business_channel_id });
+    const contract_entity = plainToInstance(ContractEntity, contract_data);
+    await manager.save(contract_entity);
+    if (note === '') return;
+    const note_entity = plainToInstance(NotesEntity, { body: note });
+    const saved_note = await manager.save(note_entity);
+    const business_channel_note_entity = plainToInstance(
+      BusinessChannelNotesEntity,
+      { business_channel_id, note_id: saved_note.id },
+    );
+    await manager.save(business_channel_note_entity);
+  }
+
   public async registerChannel(
     data: AuthRegisterChannelDto,
-    businessId: number,
+    payload: { businessId: number; onboardingId?: number },
   ) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
@@ -216,22 +270,23 @@ export default class AuthService {
         query_runner.manager,
       );
 
-      const [channel, business] = await Promise.all([
+      const [channel, business, missingDealAlert] = await Promise.all([
         query_runner.manager.findOne(ChannelEntity, {
           where: { name: data.channelName },
         }),
         query_runner.manager.findOne(BusinessEntity, {
-          where: { id: businessId },
+          where: { id: payload.businessId },
+        }),
+        query_runner.manager.findOne(AlertsEntity, {
+          where: { name: Alerts.MISSING_DEAL },
         }),
       ]);
-
       if (!business) {
         throw new NotFoundException('business not found');
       }
       if (channel) {
         throw new ConflictException('channel already exists');
       }
-
       const channel_entity = plainToInstance(ChannelEntity, {
         name: data.channelName,
         link: data.channelLink,
@@ -243,7 +298,23 @@ export default class AuthService {
         channelId: channel_data.id,
         userId: user.id,
       });
+      const businessChannel = await query_runner.manager.save(
+        business_channel_entity,
+      );
 
+      if (!payload?.onboardingId) {
+        const alert = plainToInstance(BusinessChannelAlertsEntity, {
+          alert_id: missingDealAlert.id,
+          business_channel_id: businessChannel.id,
+        });
+        await query_runner.manager.save(alert);
+      } else {
+        await this.onboardChannel(
+          query_runner.manager,
+          payload.onboardingId,
+          businessChannel.id,
+        );
+      }
       const { access_token, refresh_token } = await this.generateTokens({
         user_id: user.id,
         role_id: user.roleId,
@@ -251,7 +322,6 @@ export default class AuthService {
         channel_id: channel_data.id,
       });
 
-      await query_runner.manager.save(business_channel_entity);
       await query_runner.commitTransaction();
       return plainToInstance(AuthRegisterChannelResponse, {
         user,
