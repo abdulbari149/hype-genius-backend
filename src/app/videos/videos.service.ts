@@ -1,5 +1,4 @@
 import { NotesRepository } from './../notes/notes.repository';
-import { JwtAccessPayload } from './../../../dist/auth.interface.d';
 import { plainToInstance } from 'class-transformer';
 import {
   ConflictException,
@@ -16,6 +15,7 @@ import AddNoteDto from './dto/add-note.dto';
 import { NotesEntity } from '../notes/entities/notes.entity';
 import { VideoNotesEntity } from '../notes/entities/video_notes.entity';
 import { NotesResponse } from '../notes/dto/notes-response.dto';
+import { JwtAccessPayload } from '../auth/auth.interface';
 @Injectable()
 export default class VideosService {
   constructor(
@@ -154,7 +154,6 @@ export default class VideosService {
       .where('vn.video_id=:video_id AND n.deleted_at IS NULL', { video_id })
       .orderBy('n.created_at', 'DESC');
     const data = await query.getRawMany();
-    console.log(data)
     return plainToInstance(NotesResponse, data);
   }
 }
