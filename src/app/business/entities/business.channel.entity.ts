@@ -15,6 +15,7 @@ import FollowUpEntity from './follow.up.entity';
 import TagsEntity from 'src/app/tags/entities/tags.entity';
 import VideosEntity from 'src/app/videos/entities/videos.entity';
 import { BusinessChannelNotesEntity } from 'src/app/notes/entities/business_channel_notes.entity';
+import { BusinessChannelAlertsEntity } from 'src/app/alerts/entities/business_channel_alerts.entity';
 
 @Entity('business_channel')
 export default class BusinessChannelEntity extends DefaultEntity {
@@ -67,4 +68,9 @@ export default class BusinessChannelEntity extends DefaultEntity {
     eager: true,
   })
   business_channel_notes: BusinessChannelNotesEntity[];
+  @OneToMany(
+    () => BusinessChannelAlertsEntity,
+    (businessChannelAlerts) => businessChannelAlerts.businessChannel,
+  )
+  business_channel_alerts: BusinessChannelAlertsEntity[];
 }

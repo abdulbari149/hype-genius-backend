@@ -1,5 +1,6 @@
 import DefaultEntity from 'src/helpers/default.entity';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
+import { BusinessChannelAlertsEntity } from './business_channel_alerts.entity';
 
 @Entity('alerts')
 export class AlertsEntity extends DefaultEntity {
@@ -23,4 +24,10 @@ export class AlertsEntity extends DefaultEntity {
     nullable: false,
   })
   priority: number;
+
+  @OneToMany(
+    () => BusinessChannelAlertsEntity,
+    (businessChannelAlerts) => businessChannelAlerts.alert,
+  )
+  business_channel_alerts: BusinessChannelAlertsEntity[];
 }
