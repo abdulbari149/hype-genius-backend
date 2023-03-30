@@ -6,10 +6,15 @@ import ChannelService from './channels.service';
 import UserModule from '../users/user.module';
 import UserEntity from '../users/entities/user.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import OnboardRequestsEntity from './entities/onboard_requests.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ChannelEntity, UserEntity]),
+    TypeOrmModule.forFeature([
+      ChannelEntity,
+      UserEntity,
+      OnboardRequestsEntity,
+    ]),
     forwardRef(() => UserModule),
   ],
   controllers: [ChannelController],
