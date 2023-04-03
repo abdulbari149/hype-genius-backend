@@ -6,7 +6,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Req,
 } from '@nestjs/common';
 import BusinessService from './business.service';
@@ -38,7 +37,7 @@ export default class BusinessController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Get('/channel')
+  @Get('/influencers')
   async getChannel(@Req() req: CustomRequest) {
     const result = await this.businessService.getChannels(
       req.payload.business_id,

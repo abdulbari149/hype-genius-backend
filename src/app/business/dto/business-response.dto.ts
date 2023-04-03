@@ -13,7 +13,7 @@ export class BusinessResponse {
   onboardingLink: string;
   @Type(() => Number)
   @Expose()
-  adminId: number;
+  admin_id: number;
   @Expose()
   createdAt: Date | null;
   @Expose()
