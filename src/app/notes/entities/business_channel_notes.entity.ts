@@ -18,4 +18,7 @@ export class BusinessChannelNotesEntity extends DefaultEntity {
   @ManyToOne(() => NotesEntity, (n) => n.business_channel_notes)
   @JoinColumn({ name: 'note_id', referencedColumnName: 'id' })
   notes: NotesEntity;
+
+  @Column({ name: 'pinned', type: 'boolean', nullable: true, default: false })
+  pinned: boolean;
 }
