@@ -20,6 +20,9 @@ import { youtube_v3, google } from 'googleapis';
 import ContractEntity from '../contract/entities/contract.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { VideoUploadEvent } from './videos.event';
+import { AlertsEntity } from '../alerts/entities/alerts.entity';
+import { alerts_enum } from 'src/common/enum';
+import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 
 @Injectable()
 export default class VideosService {
@@ -44,7 +47,6 @@ export default class VideosService {
         id: ids,
         part: ['snippet', 'statistics'],
       });
-    // TODO: Return Link (DONE)
     return data.data.items.map((item) => {
       return {
         link: 'https://www.youtube.com/watch?v=' + item.id,
@@ -58,7 +60,6 @@ export default class VideosService {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
-      // TODO: check if the contract exists; (DONE)
       const manager = query_runner.manager;
       const [video, businessChannel] = await Promise.all([
         manager.findOne(VideosEntity, {
@@ -88,6 +89,28 @@ export default class VideosService {
         is_payment_due: true,
         business_channel_id: businessChannel.id,
       });
+
+      const promise1 = query_runner.manager.find(AlertsEntity, {
+        where: { name: alerts_enum.PAYMENT_DUE },
+      });
+      const promise2 = query_runner.manager.find(AlertsEntity, {
+        where: { name: alerts_enum.NEW_VIDEO_UPLOAD },
+      });
+      const alerts = await Promise.all([promise1, promise2]);
+      const [payment_due_alert, new_video_upload_alert] = alerts;
+  /*
+      Yahan bas map lagana hai
+      const mapped_business_channel_alert = plainToInstance(
+        BusinessChannelAlertsEntity,
+        {
+          business_channel_id: businessChannel.id,
+          alert_id: payment_due_alert.id,
+        },
+      );
+      const business_channel_alert = await query_runner.manager.save(
+        BusinessChannelAlertsEntity,
+      );
+      */
       // TODO:
       // Create both alerts and businessChannelVidoeAlerts;
       // New video uploaded

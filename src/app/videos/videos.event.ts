@@ -21,7 +21,6 @@ export class VideoNotificationService {
   @OnEvent('video.views')
   async videoViewsUpdate(payload: VideoUploadEvent) {
     this.videoService.getVideosInfo(payload.links).then((data) => {
-      // TODO: update views for a video in database
       const videoRepository = this.dataSource.getRepository(VideosEntity);
       return Promise.all(
         data.map(async (item) => {

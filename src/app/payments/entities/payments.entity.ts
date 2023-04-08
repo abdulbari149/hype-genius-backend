@@ -3,30 +3,44 @@ import DefaultEntity from '../../../helpers/default.entity';
 import { payment_status_enums } from 'src/common/enum';
 import CurrencyEntity from 'src/app/currency/entities/currency.entity';
 import VideosEntity from 'src/app/videos/entities/videos.entity';
+import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
 
 @Entity('payments')
 export default class PaymentsEntity extends DefaultEntity {
   @Column({
-    name: 'amount',
+    name: 'business_amount',
     type: 'bigint',
     nullable: false,
   })
-  amount: number;
+  business_amount: number;
 
   @Column({
-    name: 'payment_status',
-    type: 'enum',
-    enum: [payment_status_enums.PAID, payment_status_enums.UNPAID],
+    name: 'channel_amount',
+    type: 'bigint',
     nullable: false,
   })
-  payment_status: payment_status_enums;
+  channel_amount: number;
 
-  @Column({ name: 'currency_id', type: 'int8', nullable: false })
-  currency_id: number;
+  @Column({ name: 'channel_currency_id', type: 'int8', nullable: false })
+  channel_currency_id: number;
 
-  @ManyToOne(() => CurrencyEntity, (c) => c.payments)
-  @JoinColumn({ name: 'currency_id', referencedColumnName: 'id' })
-  currencies: CurrencyEntity;
+  @ManyToOne(() => CurrencyEntity, (c) => c.channel_payments)
+  @JoinColumn({ name: 'channel_currency_id', referencedColumnName: 'id' })
+  channel_currencies: CurrencyEntity;
+
+  @Column({ name: 'business_currency_id', type: 'int8', nullable: false })
+  business_currency_id: number;
+
+  @ManyToOne(() => CurrencyEntity, (c) => c.business_payments)
+  @JoinColumn({ name: 'business_currency_id', referencedColumnName: 'id' })
+  business_currencies: CurrencyEntity;
+
+  @Column({ name: 'business_channel_id', type: 'int8', nullable: false })
+  business_channel_id: number;
+
+  @ManyToOne(() => BusinessChannelEntity, (bc) => bc.payments)
+  @JoinColumn({ name: 'business_channel_id', referencedColumnName: 'id' })
+  business_channels: BusinessChannelEntity;
 
   @OneToMany(() => VideosEntity, (v) => v.payments, {
     cascade: true,

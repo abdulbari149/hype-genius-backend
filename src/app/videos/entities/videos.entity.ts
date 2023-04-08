@@ -3,6 +3,7 @@ import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
 import PaymentsEntity from 'src/app/payments/entities/payments.entity';
 import { VideoNotesEntity } from 'src/app/notes/entities/video_notes.entity';
+import BusinessChannelAlertVideoEntity from './business.channel.video.alert.entity';
 
 @Entity('videos')
 export default class VideosEntity extends DefaultEntity {
@@ -54,4 +55,11 @@ export default class VideosEntity extends DefaultEntity {
     eager: true,
   })
   video_notes: VideoNotesEntity[];
+
+  @OneToMany(() => BusinessChannelAlertVideoEntity, (bcav) => bcav.videos, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  business_channel_alert_video: BusinessChannelAlertVideoEntity[];
 }

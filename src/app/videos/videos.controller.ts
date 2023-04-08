@@ -39,7 +39,6 @@ export default class VideosController {
     );
   }
 
-  // TODO: query param is_payment_due (DONE)
   @HttpCode(HttpStatus.OK)
   @Get('/')
   async getVideos(

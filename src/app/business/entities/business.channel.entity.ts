@@ -16,6 +16,7 @@ import TagsEntity from 'src/app/tags/entities/tags.entity';
 import VideosEntity from 'src/app/videos/entities/videos.entity';
 import { BusinessChannelNotesEntity } from 'src/app/notes/entities/business_channel_notes.entity';
 import { BusinessChannelAlertsEntity } from 'src/app/alerts/entities/business_channel_alerts.entity';
+import PaymentsEntity from 'src/app/payments/entities/payments.entity';
 
 @Entity('business_channel')
 export default class BusinessChannelEntity extends DefaultEntity {
@@ -73,4 +74,11 @@ export default class BusinessChannelEntity extends DefaultEntity {
     (businessChannelAlerts) => businessChannelAlerts.businessChannel,
   )
   business_channel_alerts: BusinessChannelAlertsEntity[];
+
+  @OneToMany(() => PaymentsEntity, (p) => p.business_channels, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  payments: PaymentsEntity;
 }

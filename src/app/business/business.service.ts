@@ -13,6 +13,7 @@ import TagsEntity from '../tags/entities/tags.entity';
 import ContractEntity from '../contract/entities/contract.entity';
 import { AlertType, BusinessChannelType, TagType } from './types';
 import { Alerts } from 'src/constants/alerts';
+import { UpdateBusinessDto } from './dto/update-business.dto';
 
 @Injectable()
 export default class BusinessService {
@@ -193,5 +194,13 @@ export default class BusinessService {
     return plainToInstance(BusinessResponse, {
       ...business,
     });
+  }
+  public async updateBusiness(business_id: number, body: UpdateBusinessDto) {
+    try {
+      const business = await this.businessRepository.update(business_id, body);
+      return business;
+    } catch (error) {
+      throw error;
+    }
   }
 }
