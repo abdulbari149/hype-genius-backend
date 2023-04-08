@@ -1,4 +1,12 @@
-import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { AlertsService } from './alerts.service';
 import { Payload } from 'src/decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
@@ -12,15 +20,20 @@ export class AlertsController {
   constructor(private alertsService: AlertsService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Get('/:business_channel_id')
+  @Get('/')
   async getBusinessChannelAlert(
     @Payload() payload: JwtAccessPayload,
-    @Param('business_channel_id') id: number,
+    @Query('business_channel_id') business_channel_id: number,
   ) {
-    const result = await this.alertsService.getBusinessChannelAlerts(
-      payload.user_id,
-      id,
-    );
+    if (!business_channel_id) {
+      throw new BadRequestException(
+        'business_channel_id is required in query params',
+      );
+    }
+    const result = await this.alertsService.getBusinessChannelAlerts({
+      business_channel_id,
+      ...payload,
+    });
     return new ResponseEntity(result);
   }
 }

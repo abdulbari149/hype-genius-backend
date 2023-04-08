@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import ContractEntity from './entities/contract.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
+import { UpdateContractDto } from './dto/update-contract.dto';
 
 @Injectable()
 export default class ContractService {
@@ -14,7 +15,7 @@ export default class ContractService {
     private dataSource: DataSource,
   ) {}
 
-  public async CreateContract(body: CreateContractDto, req: Request) {
+  public async CreateContract(body: CreateContractDto) {
     const query_runner = this.dataSource.createQueryRunner();
     await query_runner.startTransaction();
     try {
@@ -30,19 +31,22 @@ export default class ContractService {
     }
   }
 
-  public async UpdateContract(body: CreateContractDto, req: Request) {
+  public async UpdateContract(id: number, data: UpdateContractDto) {
     const query_runner = this.dataSource.createQueryRunner();
-    const { contract_id, ...data } = body;
     await query_runner.startTransaction();
     try {
-      const contracts = await query_runner.manager.findOne(ContractEntity, {
-        where: { id: contract_id },
+      const contract = await query_runner.manager.findOne(ContractEntity, {
+        where: { id: id, business_channel_id: data.business_channel_id },
       });
-      const mapped_contract = plainToInstance(ContractEntity, data);
-      const response = await query_runner.manager.save(ContractEntity, {
-        ...contracts,
-        ...mapped_contract,
+
+      if (!contract) {
+        throw new NotFoundException('Contract not found');
+      }
+      const updated_contract = plainToInstance(ContractEntity, {
+        ...contract,
+        ...data,
       });
+      const response = await query_runner.manager.save(updated_contract);
       await query_runner.commitTransaction();
       return response;
     } catch (error) {

@@ -54,6 +54,10 @@ export default class VideosService {
         is_payment_due: true,
         business_channel_id: businessChannel.id,
       });
+      // TODO:
+      // Create both alerts and businessChannelVidoeAlerts;
+      // New video uploaded
+      // Payment Due
       const video_data = await manager.save(video_entity);
       await query_runner.commitTransaction();
       return plainToInstance(VideosResponseDto, video_data);

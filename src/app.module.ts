@@ -33,6 +33,7 @@ import { NotesModule } from './app/notes/notes.module';
 import { AlertsSeeder } from './seeders/alerts.seeder';
 import ChannelModule from './app/channels/channels.module';
 import CurrencyModule from './app/currency/currency.module';
+import { AlertsModule } from './app/alerts/alerts.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import CurrencyModule from './app/currency/currency.module';
     ChannelModule,
     CurrencyModule,
     NotesModule,
+    AlertsModule,
   ],
   controllers: [AppController],
   providers: [

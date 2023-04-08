@@ -174,7 +174,7 @@ export default class BusinessService {
       } else if (alert && alert.name === Alerts.MISSING_DEAL) {
         paymentStatus = undefined;
       } else if (alert) {
-        paymentStatus = 'paid'
+        paymentStatus = 'paid';
       }
       return {
         ...businessChannel,

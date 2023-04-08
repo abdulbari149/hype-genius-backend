@@ -3,6 +3,7 @@ import { AlertsRepository } from './alerts.repository';
 import { DataSource } from 'typeorm';
 import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import { BusinessChannelAlertsEntity } from './entities/business_channel_alerts.entity';
+import { JwtAccessPayload } from '../auth/auth.interface';
 
 @Injectable()
 export class AlertsService {
@@ -11,23 +12,32 @@ export class AlertsService {
     private dataSource: DataSource,
   ) {}
   public async getBusinessChannelAlerts(
-    userId: number,
-    business_channel_id: number,
+    payload: JwtAccessPayload & { business_channel_id: number },
   ) {
     const business_channel = await this.dataSource
       .getRepository(BusinessChannelEntity)
       .find({
-        where: { userId, id: business_channel_id },
+        where: {
+          businessId: payload.business_id,
+          id: payload.business_channel_id,
+        },
       });
 
     if (!business_channel) {
-      throw new NotFoundException('No business-channel found against user');
+      throw new NotFoundException('No business-channel found');
     }
-    const business_channel_alerts = await this.dataSource
+    const businessChannelAlerts = await this.dataSource
       .getRepository(BusinessChannelAlertsEntity)
       .find({
-        where: { business_channel_id },
+        where: { business_channel_id: payload.business_channel_id },
+        loadEagerRelations: false,
+        relations: { alert: true },
+        order: { alert: { priority: 'DESC' } },
       });
-    return business_channel_alerts;
+    return businessChannelAlerts.map((businessChannelAlert) => ({
+      ...businessChannelAlert.alert,
+      id: businessChannelAlert.id,
+      alertId: businessChannelAlert.alert_id,
+    }));
   }
 }

@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Req,
@@ -12,6 +13,8 @@ import {
 import { Request } from 'express';
 import ContractService from './contract.service';
 import { CreateContractDto } from './dto/create-contract.dto';
+import ResponseEntity from 'src/helpers/ResponseEntity';
+import { UpdateContractDto } from './dto/update-contract.dto';
 @Controller({
   path: '/contracts',
   version: '1',
@@ -22,41 +25,29 @@ export default class ContractController {
   @HttpCode(HttpStatus.CREATED)
   @Post('/')
   async CreateContract(@Body() body: CreateContractDto, @Req() req: Request) {
-    try {
-      const response = await this.contractService.CreateContract(
-        { ...body },
-        req,
-      );
-      return { ...response, message: 'Created' };
-    } catch (error) {
-      throw error;
-    }
+    const response = await this.contractService.CreateContract(body);
+    return new ResponseEntity(
+      response,
+      'Contract Created Successfully',
+      HttpStatus.CREATED,
+    );
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Put('/')
-  async UpdateContract(@Body() body: CreateContractDto, @Req() req: Request) {
-    try {
-      const response = await this.contractService.UpdateContract(
-        { ...body },
-        req,
-      );
-      return { ...response, message: 'Updated' };
-    } catch (error) {
-      throw error;
-    }
+  @Put('/:id')
+  async UpdateContract(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateContractDto,
+  ) {
+    const response = await this.contractService.UpdateContract(id, body);
+    return { ...response, message: 'Updated' };
   }
 
   @Get(':business_channel_id')
   async GetContract(@Param('business_channel_id') business_channel_id: number) {
-    try {
-      const contract = await this.contractService.GetContract(
-        business_channel_id,
-      );
-      return contract;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
+    const contract = await this.contractService.GetContract(
+      business_channel_id,
+    );
+    return new ResponseEntity(contract, 'Contract Updated Successfully');
   }
 }
