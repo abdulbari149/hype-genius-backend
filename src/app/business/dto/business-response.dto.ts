@@ -11,6 +11,12 @@ export class BusinessResponse {
   link: string;
   @Expose()
   onboardingLink: string;
+  @Expose()
+  default_currency_id?: number;
+  @Expose()
+  customer_ltv?: number;
+  @Expose()
+  acrvv?: number;
   @Type(() => Number)
   @Expose()
   admin_id: number;

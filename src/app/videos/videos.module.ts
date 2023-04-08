@@ -6,6 +6,7 @@ import VideosService from './videos.service';
 import UserModule from '../users/user.module';
 import UserEntity from '../users/entities/user.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { VideoNotificationService } from './videos.event';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { IsExist } from 'src/utils/validators/is-exists.validator';
     forwardRef(() => UserModule),
   ],
   controllers: [VideosController],
-  providers: [VideosService, IsExist],
+  providers: [VideosService, IsExist, VideoNotificationService],
   exports: [VideosService],
 })
 export default class VideosModule {}

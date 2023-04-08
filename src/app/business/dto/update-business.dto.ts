@@ -4,11 +4,8 @@ import {
   IsNumber,
   IsOptional,
   IsPositive,
-  IsString,
-  IsUrl,
   Validate,
 } from 'class-validator';
-import { acrvv_enum } from 'src/common/enum';
 import { MESSAGES } from 'src/common/messages';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 const {
@@ -18,15 +15,6 @@ const {
 } = MESSAGES;
 
 export class UpdateBusinessDto {
-  @IsOptional()
-  @IsString()
-  public name: string;
-
-  @IsOptional()
-  @IsString()
-  @IsUrl()
-  public link: string;
-
   @IsOptional()
   @IsNumber()
   @IsInt()
@@ -42,5 +30,6 @@ export class UpdateBusinessDto {
   customer_ltv: number;
 
   @IsOptional()
-  acrvv: acrvv_enum | number;
+  @IsNumber()
+  acrvv: number;
 }

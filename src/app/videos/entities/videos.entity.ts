@@ -3,7 +3,7 @@ import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
 import PaymentsEntity from 'src/app/payments/entities/payments.entity';
 import { VideoNotesEntity } from 'src/app/notes/entities/video_notes.entity';
-import BusinessChannelAlertVideoEntity from './business.channel.video.alert.entity';
+import BusinessChannelAlertVideoEntity from './business_channel_video_alert.entity';
 
 @Entity('videos')
 export default class VideosEntity extends DefaultEntity {

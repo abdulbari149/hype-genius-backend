@@ -1,6 +1,14 @@
-import { IsBoolean, IsNotEmpty, IsNumber, Validate } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Validate,
+} from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { MESSAGES } from '../../../common/messages';
+import { UploadFrequencies } from 'src/constants/upload_frequencies';
 const {
   CURRENCY: {
     ERROR: { CURRENCY_NOT_FOUND },
@@ -15,9 +23,10 @@ export class CreateContractDto {
   @IsNotEmpty()
   is_one_time: boolean;
 
-  @IsNumber()
+  @IsString()
+  @IsEnum(UploadFrequencies)
   @IsNotEmpty()
-  upload_frequency: number;
+  upload_frequency: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -28,12 +37,12 @@ export class CreateContractDto {
   @Validate(IsExist, ['currencies', 'id'], {
     message: CURRENCY_NOT_FOUND,
   })
-  currency_id: number | null;
+  currency_id: number;
 
   @IsNumber()
   @IsNotEmpty()
   @Validate(IsExist, ['business_channel', 'id'], {
     message: BUSINESS_CHANNEL_NOT_FOUND,
   })
-  business_channel_id: number | null;
+  business_channel_id: number;
 }

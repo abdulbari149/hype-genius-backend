@@ -20,7 +20,7 @@ export default class ContractEntity extends DefaultEntity {
     enumName: 'upload_frequency_enum',
     nullable: false,
   })
-  upload_frequency: number;
+  upload_frequency: string;
 
   @Column({ name: 'amount', type: 'float', nullable: false })
   amount: number;

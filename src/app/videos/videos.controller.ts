@@ -16,10 +16,12 @@ import {
 import { CreateVideoDto } from './dto/create-video.dto';
 import VideosService from './videos.service';
 import { Payload } from 'src/decorators/payload.decorator';
-import { DataSource } from 'typeorm';
+import { DataSource, FindOptionsWhere } from 'typeorm';
 import ROLES from 'src/constants/roles';
 import AddNoteDto from './dto/add-note.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
+import VideosEntity from './entities/videos.entity';
+import { GetVideosQueryDto } from './dto/get-videos-query.dto';
 
 @Controller({
   path: '/videos',
@@ -42,27 +44,20 @@ export default class VideosController {
   @HttpCode(HttpStatus.OK)
   @Get('/')
   async getVideos(
-    @Query('business_channel_id')
-    business_channel_id?: number,
-    @Query('is_payment_due')
-    is_payment_due?: boolean,
+    @Query() query: GetVideosQueryDto,
     @Payload() payload?: JwtAccessPayload,
   ) {
-    const parsedId = parseInt(business_channel_id.toString());
-    if (
-      payload.role === ROLES.BUSINESS_ADMIN &&
-      (!business_channel_id || isNaN(parsedId))
-    ) {
+    if (payload.role === ROLES.BUSINESS_ADMIN && !query.business_channel_id) {
       throw new BadRequestException('business_channel_id is required');
     }
-
-    const id = !isNaN(parsedId) ? parsedId : null;
-
-    const result = await this.videosService.getVideos(
-      id,
-      is_payment_due,
-      payload,
-    );
+    const where: Partial<FindOptionsWhere<VideosEntity>> = {};
+    if (typeof query?.business_channel_id !== 'undefined') {
+      where.business_channel_id = query.business_channel_id;
+    }
+    if (typeof query?.is_payment_due !== 'undefined') {
+      where.is_payment_due = query.is_payment_due;
+    }
+    const result = await this.videosService.getVideos(where, payload);
     return new ResponseEntity(result, `Video Uploads List`);
   }
 

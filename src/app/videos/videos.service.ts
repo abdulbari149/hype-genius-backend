@@ -1,11 +1,10 @@
-import { NotesRepository } from './../notes/notes.repository';
 import { plainToInstance } from 'class-transformer';
 import {
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Repository, DataSource, In } from 'typeorm';
+import { Repository, DataSource, In, FindOptionsWhere } from 'typeorm';
 import VideosEntity from './entities/videos.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateVideoDto } from './dto/create-video.dto';
@@ -16,13 +15,13 @@ import { NotesEntity } from '../notes/entities/notes.entity';
 import { VideoNotesEntity } from '../notes/entities/video_notes.entity';
 import { NotesResponse } from '../notes/dto/notes-response.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
-import { youtube_v3, google } from 'googleapis';
 import ContractEntity from '../contract/entities/contract.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { VideoUploadEvent } from './videos.event';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
-import { alerts_enum } from 'src/common/enum';
+import { VideoNotificationService, VideoUploadEvent } from './videos.event';
+import { Alerts } from 'src/constants/alerts';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
+import BusinessChannelAlertVideoEntity from './entities/business_channel_video_alert.entity';
 
 @Injectable()
 export default class VideosService {
@@ -31,37 +30,14 @@ export default class VideosService {
     @InjectRepository(VideosEntity)
     private videosRepository: Repository<VideosEntity>,
     private eventEmitter: EventEmitter2,
+    private videoNotificationService: VideoNotificationService,
   ) {}
-
-  public async getVideosInfo(links: string[]) {
-    const ids = links.map((link: string) => {
-      const ytURL = new URL(link);
-      return ytURL.searchParams.get('v');
-    });
-    const data = await google
-      .youtube({
-        version: 'v3',
-        auth: 'AIzaSyABqkxOM2LyiIyo-wg9AuW8js3OIbb_pp4',
-      })
-      .videos.list({
-        id: ids,
-        part: ['snippet', 'statistics'],
-      });
-    return data.data.items.map((item) => {
-      return {
-        link: 'https://www.youtube.com/watch?v=' + item.id,
-        title: item.snippet.title,
-        views: item.statistics.viewCount,
-      };
-    });
-  }
-
   public async createVideo(data: CreateVideoDto, channelId: number) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
       const manager = query_runner.manager;
-      const [video, businessChannel] = await Promise.all([
+      const [video, businessChannel, alerts] = await Promise.all([
         manager.findOne(VideosEntity, {
           where: { link: data.link },
           loadEagerRelations: false,
@@ -71,8 +47,12 @@ export default class VideosService {
           loadEagerRelations: false,
           relations: { business: true, channel: true },
         }),
+        manager.find(AlertsEntity, {
+          where: { name: In([Alerts.NEW_VIDEO, Alerts.PAYMENT_DUE]) },
+          loadEagerRelations: false,
+        }),
       ]);
-      const contract = await manager.find(ContractEntity, {
+      const contract = await manager.findOne(ContractEntity, {
         where: { business_channel_id: businessChannel.id },
       });
       if (!contract) {
@@ -81,7 +61,9 @@ export default class VideosService {
       if (video) throw new ConflictException('Video already exists');
       if (!businessChannel)
         throw new NotFoundException(`Not Associated with the business`);
-      const videoInfo = await this.getVideosInfo([data.link]);
+      const videoInfo = await this.videoNotificationService.getVideosInfo([
+        data.link,
+      ]);
       const video_entity = plainToInstance(VideosEntity, {
         title: videoInfo[0].title,
         link: data.link,
@@ -89,33 +71,31 @@ export default class VideosService {
         is_payment_due: true,
         business_channel_id: businessChannel.id,
       });
-
-      const promise1 = query_runner.manager.find(AlertsEntity, {
-        where: { name: alerts_enum.PAYMENT_DUE },
-      });
-      const promise2 = query_runner.manager.find(AlertsEntity, {
-        where: { name: alerts_enum.NEW_VIDEO_UPLOAD },
-      });
-      const alerts = await Promise.all([promise1, promise2]);
-      const [payment_due_alert, new_video_upload_alert] = alerts;
-  /*
-      Yahan bas map lagana hai
-      const mapped_business_channel_alert = plainToInstance(
-        BusinessChannelAlertsEntity,
-        {
-          business_channel_id: businessChannel.id,
-          alert_id: payment_due_alert.id,
-        },
-      );
-      const business_channel_alert = await query_runner.manager.save(
-        BusinessChannelAlertsEntity,
-      );
-      */
-      // TODO:
-      // Create both alerts and businessChannelVidoeAlerts;
-      // New video uploaded
-      // Payment Due
       const video_data = await manager.save(video_entity);
+
+      await Promise.all(
+        alerts.map((alert) => {
+          return (async () => {
+            const businessChannelAlert = plainToInstance(
+              BusinessChannelAlertsEntity,
+              {
+                business_channel_id: businessChannel.id,
+                alert_id: alert.id,
+              },
+            );
+            await manager.save(businessChannelAlert);
+            const businessChannelVideoAlert = plainToInstance(
+              BusinessChannelAlertVideoEntity,
+              {
+                business_channel_alert_id: businessChannelAlert.id,
+                video_id: video_data.id,
+              },
+            );
+            manager.save(businessChannelVideoAlert);
+          })();
+        }),
+      );
+
       await query_runner.commitTransaction();
       return plainToInstance(VideosResponseDto, video_data);
     } catch (error) {
@@ -127,12 +107,12 @@ export default class VideosService {
   }
 
   public async getVideos(
-    business_channel_id: number | null,
-    is_payment_due: boolean,
+    where: Partial<FindOptionsWhere<VideosEntity>>,
     payload: JwtAccessPayload,
   ) {
+    const { business_channel_id, ...restWhere } = where;
     const ids: number[] = [];
-    if (business_channel_id === null) {
+    if (!business_channel_id) {
       const businessChannels = await this.dataSource
         .getRepository(BusinessChannelEntity)
         .find({
@@ -142,15 +122,19 @@ export default class VideosService {
         });
       ids.push(...businessChannels.map((bc) => bc.id));
     } else {
-      ids.push(business_channel_id);
+      if (typeof business_channel_id === 'number') {
+        ids.push(business_channel_id);
+      }
     }
     const video_data = await this.videosRepository.find({
-      where: { business_channel_id: In(ids), is_payment_due },
+      where: { business_channel_id: In(ids), ...restWhere },
       loadEagerRelations: false,
       relations: { payments: true },
     });
     const links = video_data.map((v) => v.link);
-    this.eventEmitter.emit('video.views', new VideoUploadEvent({ links }));
+    if (links.length > 0) {
+      this.eventEmitter.emit('video.views', new VideoUploadEvent({ links }));
+    }
     return plainToInstance(VideosResponseDto, video_data);
   }
 

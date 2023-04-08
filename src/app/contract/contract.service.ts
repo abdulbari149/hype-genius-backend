@@ -1,11 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import ContractEntity from './entities/contract.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateContractDto } from './dto/create-contract.dto';
-import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 import { UpdateContractDto } from './dto/update-contract.dto';
+import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
+import { Alerts } from 'src/constants/alerts';
+import { AlertsEntity } from '../alerts/entities/alerts.entity';
 
 @Injectable()
 export default class ContractService {
@@ -19,8 +25,34 @@ export default class ContractService {
     const query_runner = this.dataSource.createQueryRunner();
     await query_runner.startTransaction();
     try {
+      const contractExists = await query_runner.manager.findOne(
+        ContractEntity,
+        { where: { business_channel_id: body.business_channel_id } },
+      );
+
+      if (contractExists) {
+        throw new ConflictException('Contract Exists');
+      }
+
       const mapped_contract = plainToInstance(ContractEntity, body);
       const response = await query_runner.manager.save(mapped_contract);
+      const alert = await query_runner.manager.findOne(AlertsEntity, {
+        where: { name: Alerts.MISSING_DEAL },
+      });
+      const missing_deal_alert = await query_runner.manager.findOne(
+        BusinessChannelAlertsEntity,
+        {
+          where: {
+            business_channel_id: body.business_channel_id,
+            alert_id: alert.id,
+          },
+          loadEagerRelations: false,
+        },
+      );
+
+      if (missing_deal_alert) {
+        await missing_deal_alert.softRemove();
+      }
       await query_runner.commitTransaction();
       return response;
     } catch (error) {

@@ -27,6 +27,6 @@ export default class BusinessChannelAlertVideoEntity extends DefaultEntity {
   video_id: number;
 
   @ManyToOne(() => VideosEntity, (v) => v.business_channel_alert_video)
-  @JoinColumn({ name: 'business_channel_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'video_id', referencedColumnName: 'id' })
   videos: VideosEntity;
 }

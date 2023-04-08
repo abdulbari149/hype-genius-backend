@@ -33,14 +33,18 @@ export default class ContractController {
     );
   }
 
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   @Put('/:id')
   async UpdateContract(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateContractDto,
   ) {
     const response = await this.contractService.UpdateContract(id, body);
-    return { ...response, message: 'Updated' };
+    return new ResponseEntity(
+      response,
+      'Contract Updated Successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Get(':business_channel_id')

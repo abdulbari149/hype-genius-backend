@@ -34,6 +34,7 @@ import { AlertsSeeder } from './seeders/alerts.seeder';
 import ChannelModule from './app/channels/channels.module';
 import CurrencyModule from './app/currency/currency.module';
 import { AlertsModule } from './app/alerts/alerts.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AlertsModule } from './app/alerts/alerts.module';
         return dataSource;
       },
     }),
+    EventEmitterModule.forRoot(),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],

@@ -49,13 +49,20 @@ export default class BusinessController {
     return new ResponseEntity(result, 'Channels List');
   }
 
-  @HttpCode(HttpStatus.CREATED)
-  @Put('/:business_id')
+  @HttpCode(HttpStatus.OK)
+  @Put('/')
   async UpdateBusiness(
-    @Param('business_id') business_id: number,
+    @Payload() payload: JwtAccessPayload,
     @Body() body: UpdateBusinessDto,
   ) {
-    const data = await this.businessService.updateBusiness(business_id, body);
-    return new ResponseEntity(data);
+    const data = await this.businessService.updateBusiness(
+      payload.business_id,
+      body,
+    );
+    return new ResponseEntity(
+      data,
+      'Business details Updated successfully',
+      HttpStatus.OK,
+    );
   }
 }
