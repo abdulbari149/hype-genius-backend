@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import VideosEntity from './entities/videos.entity';
 import { youtube_v3, google } from 'googleapis';
+import VideosService from './videos.service';
 
 export class VideoUploadEvent {
   public links: string[];
@@ -13,35 +14,12 @@ export class VideoUploadEvent {
 
 @Injectable()
 export class VideoNotificationService {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource, private videoService: VideosService) {}
+  @OnEvent('video.views')
+  async videoViewsUpdate(payload: VideoUploadEvent) {
+    this.videoService.getVideosInfo(payload.links).then((data) => {
+      // TODO: update views for a video in database
 
-  private async getVideosInfo(links: string[]) {
-    const ids = links.map((link: string) => {
-      const ytURL = new URL(link);
-      return ytURL.searchParams.get('v');
-    });
-
-    const data = await google
-      .youtube({
-        version: 'v3',
-        auth: 'AIzaSyABqkxOM2LyiIyo-wg9AuW8js3OIbb_pp4',
-      })
-      .videos.list({
-        id: ids,
-        part: ['snippet', 'statistics'],
-      });
-    return data.data.items.map((item) => {
-      return {
-        title: item.snippet.title,
-        views: item.statistics.viewCount,
-      };
-    });
-  }
-
-  @OnEvent('video.upload')
-  async videoUpload(payload: VideoUploadEvent) {
-    this.getVideosInfo(payload.links).then((data) => {
-      console.log(data);
     });
   }
 }

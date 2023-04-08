@@ -9,10 +9,6 @@ import { IsExist } from 'src/utils/validators/is-exists.validator';
 
 export class CreateVideoDto {
   @IsNotEmpty()
-  @IsString()
-  title: string;
-
-  @IsNotEmpty()
   @IsUrl()
   @IsString()
   link: string;

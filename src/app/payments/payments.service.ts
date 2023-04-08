@@ -9,4 +9,6 @@ export default class PaymentsService {
     @InjectRepository(PaymentsEntity)
     private tagsRepository: Repository<PaymentsEntity>,
   ) {}
+
+  // TODO: create payment
 }

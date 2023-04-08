@@ -16,6 +16,8 @@ import { NotesEntity } from '../notes/entities/notes.entity';
 import { VideoNotesEntity } from '../notes/entities/video_notes.entity';
 import { NotesResponse } from '../notes/dto/notes-response.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
+import { youtube_v3, google } from 'googleapis';
+
 @Injectable()
 export default class VideosService {
   constructor(
@@ -24,11 +26,34 @@ export default class VideosService {
     private videosRepository: Repository<VideosEntity>,
   ) {}
 
+  public async getVideosInfo(links: string[]) {
+    const ids = links.map((link: string) => {
+      const ytURL = new URL(link);
+      return ytURL.searchParams.get('v');
+    });
+    const data = await google
+      .youtube({
+        version: 'v3',
+        auth: 'AIzaSyABqkxOM2LyiIyo-wg9AuW8js3OIbb_pp4',
+      })
+      .videos.list({
+        id: ids,
+        part: ['snippet', 'statistics'],
+      });
+      // TODO: Return Link
+    return data.data.items.map((item) => {
+      return {
+        title: item.snippet.title,
+        views: item.statistics.viewCount,
+      };
+    });
+  }
+
   public async createVideo(data: CreateVideoDto, channelId: number) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
-
+      // TODO: check if the contract exists;
       const manager = query_runner.manager;
 
       const [video, businessChannel] = await Promise.all([
@@ -46,11 +71,11 @@ export default class VideosService {
       if (video) throw new ConflictException('Video already exists');
       if (!businessChannel)
         throw new NotFoundException(`Not Associated with the business`);
-
+      const videoInfo = await this.getVideosInfo([data.link]);
       const video_entity = plainToInstance(VideosEntity, {
-        title: data.title,
+        title: videoInfo[0].title,
         link: data.link,
-        views: 0,
+        views: videoInfo[0].views,
         is_payment_due: true,
         business_channel_id: businessChannel.id,
       });
@@ -91,6 +116,8 @@ export default class VideosService {
       loadEagerRelations: false,
       relations: { payments: true },
     });
+    // TODO: Emit an event 'videos.view'
+    // this.even
     return plainToInstance(VideosResponseDto, video_data);
   }
 
