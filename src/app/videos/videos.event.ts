@@ -14,12 +14,23 @@ export class VideoUploadEvent {
 
 @Injectable()
 export class VideoNotificationService {
-  constructor(private dataSource: DataSource, private videoService: VideosService) {}
+  constructor(
+    private dataSource: DataSource,
+    private videoService: VideosService,
+  ) {}
   @OnEvent('video.views')
   async videoViewsUpdate(payload: VideoUploadEvent) {
     this.videoService.getVideosInfo(payload.links).then((data) => {
       // TODO: update views for a video in database
-
+      const videoRepository = this.dataSource.getRepository(VideosEntity);
+      return Promise.all(
+        data.map(async (item) => {
+          await videoRepository.update(
+            { link: item.link },
+            { views: item.views },
+          );
+        }),
+      );
     });
   }
 }

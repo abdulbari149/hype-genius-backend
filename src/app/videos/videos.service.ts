@@ -17,6 +17,8 @@ import { VideoNotesEntity } from '../notes/entities/video_notes.entity';
 import { NotesResponse } from '../notes/dto/notes-response.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import { youtube_v3, google } from 'googleapis';
+import ContractEntity from '../contract/entities/contract.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export default class VideosService {
@@ -40,9 +42,10 @@ export default class VideosService {
         id: ids,
         part: ['snippet', 'statistics'],
       });
-      // TODO: Return Link
+    // TODO: Return Link (DONE)
     return data.data.items.map((item) => {
       return {
+        link: 'https://www.youtube.com/watch?v=' + item.id,
         title: item.snippet.title,
         views: item.statistics.viewCount,
       };
@@ -53,9 +56,8 @@ export default class VideosService {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
-      // TODO: check if the contract exists;
+      // TODO: check if the contract exists; (DONE)
       const manager = query_runner.manager;
-
       const [video, businessChannel] = await Promise.all([
         manager.findOne(VideosEntity, {
           where: { link: data.link },
@@ -67,7 +69,12 @@ export default class VideosService {
           relations: { business: true, channel: true },
         }),
       ]);
-
+      const contract = await manager.find(ContractEntity, {
+        where: { business_channel_id: businessChannel.id },
+      });
+      if (!contract) {
+        throw new NotFoundException('Contract not found');
+      }
       if (video) throw new ConflictException('Video already exists');
       if (!businessChannel)
         throw new NotFoundException(`Not Associated with the business`);
@@ -96,6 +103,7 @@ export default class VideosService {
 
   public async getVideos(
     business_channel_id: number | null,
+    is_payment_due: boolean,
     payload: JwtAccessPayload,
   ) {
     const ids: number[] = [];
@@ -112,12 +120,12 @@ export default class VideosService {
       ids.push(business_channel_id);
     }
     const video_data = this.videosRepository.find({
-      where: { business_channel_id: In(ids) },
+      where: { business_channel_id: In(ids), is_payment_due },
       loadEagerRelations: false,
       relations: { payments: true },
     });
-    // TODO: Emit an event 'videos.view'
-    // this.even
+
+    trigger;
     return plainToInstance(VideosResponseDto, video_data);
   }
 

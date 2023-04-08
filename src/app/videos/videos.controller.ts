@@ -39,12 +39,14 @@ export default class VideosController {
     );
   }
 
-  // TODO: query param is_payment_due
+  // TODO: query param is_payment_due (DONE)
   @HttpCode(HttpStatus.OK)
   @Get('/')
   async getVideos(
     @Query('business_channel_id')
     business_channel_id?: number,
+    @Query('is_payment_due')
+    is_payment_due?: boolean,
     @Payload() payload?: JwtAccessPayload,
   ) {
     const parsedId = parseInt(business_channel_id.toString());
@@ -57,7 +59,11 @@ export default class VideosController {
 
     const id = !isNaN(parsedId) ? parsedId : null;
 
-    const result = await this.videosService.getVideos(id, payload);
+    const result = await this.videosService.getVideos(
+      id,
+      is_payment_due,
+      payload,
+    );
     return new ResponseEntity(result, `Video Uploads List`);
   }
 
