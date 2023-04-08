@@ -19,6 +19,7 @@ import { JwtAccessPayload } from '../auth/auth.interface';
 import { youtube_v3, google } from 'googleapis';
 import ContractEntity from '../contract/entities/contract.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { VideoUploadEvent } from './videos.event';
 
 @Injectable()
 export default class VideosService {
@@ -26,6 +27,7 @@ export default class VideosService {
     private dataSource: DataSource,
     @InjectRepository(VideosEntity)
     private videosRepository: Repository<VideosEntity>,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   public async getVideosInfo(links: string[]) {
@@ -119,13 +121,13 @@ export default class VideosService {
     } else {
       ids.push(business_channel_id);
     }
-    const video_data = this.videosRepository.find({
+    const video_data = await this.videosRepository.find({
       where: { business_channel_id: In(ids), is_payment_due },
       loadEagerRelations: false,
       relations: { payments: true },
     });
-
-    trigger;
+    const links = video_data.map((v) => v.link);
+    this.eventEmitter.emit('video.views', new VideoUploadEvent({ links }));
     return plainToInstance(VideosResponseDto, video_data);
   }
 
