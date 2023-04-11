@@ -35,6 +35,7 @@ import ChannelModule from './app/channels/channels.module';
 import CurrencyModule from './app/currency/currency.module';
 import { AlertsModule } from './app/alerts/alerts.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import PaymentsModule from './app/payments/payments.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CurrencyModule,
     NotesModule,
     AlertsModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

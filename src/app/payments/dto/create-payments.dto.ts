@@ -18,7 +18,7 @@ export class CreatePaymentsDto {
   @IsInt()
   @IsPositive()
   @IsNotIn([0])
-  @Validate(IsExist, ['business_channels', 'id'], {
+  @Validate(IsExist, ['business_channel', 'id'], {
     message: 'Business Channel not found',
   })
   business_channel_id: number;
