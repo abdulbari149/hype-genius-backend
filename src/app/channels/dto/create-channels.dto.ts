@@ -1,3 +1,1 @@
-export class CreateChannelsDto {
-
-}
+export class CreateChannelsDto {}

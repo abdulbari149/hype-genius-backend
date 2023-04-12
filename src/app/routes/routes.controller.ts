@@ -1,8 +1,7 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { RoutesService } from './routes.service';
 import { CreateRoutesDto } from './dto/create-routes.dto';
 import { Public } from 'src/decorators/public.decorator';
-import { Request } from 'express';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 
 @Controller({
@@ -14,8 +13,8 @@ export class RoutesController {
 
   @Public()
   @Post('/')
-  async createRoutes(@Body() data: CreateRoutesDto, @Req() req: Request) {
-    const res = await this.routesService.Create(data, req);
+  async createRoutes(@Body() data: CreateRoutesDto) {
+    const res = await this.routesService.Create(data);
     return new ResponseEntity(res, 'Route has been created successfully');
   }
 }

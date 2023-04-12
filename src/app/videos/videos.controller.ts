@@ -9,15 +9,13 @@ import {
   Req,
   Get,
   Query,
-  BadRequestException,
   ParseIntPipe,
   Param,
 } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import VideosService from './videos.service';
 import { Payload } from 'src/decorators/payload.decorator';
-import { DataSource, FindOptionsWhere } from 'typeorm';
-import ROLES from 'src/constants/roles';
+import { FindOptionsWhere } from 'typeorm';
 import AddNoteDto from './dto/add-note.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import VideosEntity from './entities/videos.entity';
@@ -47,17 +45,19 @@ export default class VideosController {
     @Query() query: GetVideosQueryDto,
     @Payload() payload?: JwtAccessPayload,
   ) {
-    if (payload.role === ROLES.BUSINESS_ADMIN && !query.business_channel_id) {
-      throw new BadRequestException('business_channel_id is required');
-    }
     const where: Partial<FindOptionsWhere<VideosEntity>> = {};
     if (typeof query?.business_channel_id !== 'undefined') {
       where.business_channel_id = query.business_channel_id;
     }
     if (typeof query?.is_payment_due !== 'undefined') {
+      console.log(query.is_payment_due);
       where.is_payment_due = query.is_payment_due;
     }
-    const result = await this.videosService.getVideos(where, payload);
+    const fields = [];
+    if (typeof query?.fields !== 'undefined') {
+      fields.push(...query.fields);
+    }
+    const result = await this.videosService.getVideos(where, payload, fields);
     return new ResponseEntity(result, `Video Uploads List`);
   }
 
@@ -82,9 +82,8 @@ export default class VideosController {
   async getNotes(
     @Req() req: CustomRequest,
     @Param('id', ParseIntPipe) videoId: number,
-    @Payload() payload: JwtAccessPayload,
   ) {
-    const result = await this.videosService.getNotes(videoId, payload);
+    const result = await this.videosService.getNotes(videoId);
     return new ResponseEntity(
       result,
       `Notes for video ${videoId}`,

@@ -1,3 +1,1 @@
-export class ContractResponseDto {
-
-}
+export class ContractResponseDto {}

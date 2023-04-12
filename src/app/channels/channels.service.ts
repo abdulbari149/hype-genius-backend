@@ -3,14 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import ChannelEntity from './entities/channels.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import OnboardRequestsEntity, {
-  OnboardRequestsData,
-} from './entities/onboard_requests.entity';
+import OnboardRequestsEntity from './entities/onboard_requests.entity';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { pick } from 'src/utils/pick';
-import { NotesEntity } from '../notes/entities/notes.entity';
-import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
-
 @Injectable()
 export default class ChannelService {
   constructor(
@@ -18,7 +13,7 @@ export default class ChannelService {
     private channelRepository: Repository<ChannelEntity>,
     @InjectRepository(OnboardRequestsEntity)
     private onboardRequestsRepository: Repository<OnboardRequestsEntity>,
-  ) { }
+  ) {}
 
   private async generateOnboardingLink() {
     const retyCount = 5;

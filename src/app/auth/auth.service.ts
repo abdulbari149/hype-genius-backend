@@ -24,7 +24,6 @@ import ROLES from 'src/constants/roles';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import AuthMeResponse from './dto/auth-me-response.dto';
 import AuthLoginResponse from './dto/auth-login-response.dto';
 import AuthRegisterBusinessResponse from './dto/auth-register-business-response.dto';
 import CreateUserDto from '../users/dto/create-user.dto';
@@ -36,7 +35,6 @@ import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel
 import OnboardRequestsEntity, {
   OnboardRequestsData,
 } from '../channels/entities/onboard_requests.entity';
-import { pick } from 'src/utils/pick';
 import { NotesEntity } from '../notes/entities/notes.entity';
 import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
 

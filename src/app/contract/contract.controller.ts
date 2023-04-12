@@ -8,9 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  Req,
 } from '@nestjs/common';
-import { Request } from 'express';
 import ContractService from './contract.service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import ResponseEntity from 'src/helpers/ResponseEntity';
@@ -24,7 +22,7 @@ export default class ContractController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('/')
-  async CreateContract(@Body() body: CreateContractDto, @Req() req: Request) {
+  async CreateContract(@Body() body: CreateContractDto) {
     const response = await this.contractService.CreateContract(body);
     return new ResponseEntity(
       response,

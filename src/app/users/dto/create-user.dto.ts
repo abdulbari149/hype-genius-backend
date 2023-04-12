@@ -4,9 +4,7 @@ import {
   IsPhoneNumber,
   IsNotEmpty,
   IsStrongPassword,
-  Validate,
 } from 'class-validator';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
 
 export default class CreateUserDto {
   @IsString()

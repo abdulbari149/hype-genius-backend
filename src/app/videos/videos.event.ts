@@ -2,8 +2,7 @@ import { DataSource } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import VideosEntity from './entities/videos.entity';
-import { youtube_v3, google } from 'googleapis';
-import VideosService from './videos.service';
+import { google } from 'googleapis';
 
 export class VideoUploadEvent {
   public links: string[];

@@ -4,7 +4,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Query,
 } from '@nestjs/common';
 import { AlertsService } from './alerts.service';

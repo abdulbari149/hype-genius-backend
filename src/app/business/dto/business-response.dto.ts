@@ -1,4 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
+import { CurrencyResponse } from 'src/app/currency/dto/currency-response.dto';
 
 @Exclude({ toClassOnly: true })
 export class BusinessResponse {
@@ -20,6 +21,9 @@ export class BusinessResponse {
   @Type(() => Number)
   @Expose()
   admin_id: number;
+  @Type(() => CurrencyResponse)
+  @Expose()
+  default_currency: CurrencyResponse;
   @Expose()
   createdAt: Date | null;
   @Expose()

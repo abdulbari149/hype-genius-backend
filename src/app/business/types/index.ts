@@ -58,3 +58,16 @@ export type GetInfluencersReturnType = BusinessChannelType & {
   alert: AlertType;
   paymentStatus?: 'paid' | 'unpaid';
 };
+
+export type VideoType = {
+  id: number;
+  title: string;
+  views: number;
+  is_payment_due: boolean;
+  payment_id: number;
+  roas: number;
+  amount?: number | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
+};
