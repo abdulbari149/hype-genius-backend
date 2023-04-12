@@ -11,6 +11,7 @@ import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel
 import ContractEntity from 'src/app/contract/entities/contract.entity';
 import TagsEntity from 'src/app/tags/entities/tags.entity';
 import VideosEntity from '../videos/entities/videos.entity';
+import BusinessCronService from './business.cron';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -25,7 +26,7 @@ import VideosEntity from '../videos/entities/videos.entity';
     forwardRef(() => UserModule),
   ],
   controllers: [BusinessController],
-  providers: [BusinessService, IsExist],
+  providers: [BusinessService, IsExist, BusinessCronService],
   exports: [BusinessService],
 })
 export default class BusinessModule {}
