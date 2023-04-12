@@ -5,12 +5,10 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { Request } from 'express';
 import { DataSource, In, Repository } from 'typeorm';
 import { RoutePermissionsEntity } from '../route_permission/entities/route-permission.entity';
 import { CreateRoutesDto } from './dto/create-routes.dto';
 import { RoutesResponse } from './dto/routes-response.dto';
-import { UpdateRoutesDto } from './dto/update-routes.dto';
 import { RoutesEntity } from './entities/route.entity';
 import { RoutesRepository } from './routes.repository';
 import { ResponseMessage } from '../../common/messages';
@@ -32,7 +30,7 @@ export class RoutesService {
     private cacheService: CacheService,
   ) {}
 
-  async Create(body: CreateRoutesDto, req?: Request): Promise<any> {
+  async Create(body: CreateRoutesDto): Promise<any> {
     const { roles, ...routeData } = body;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -79,8 +77,7 @@ export class RoutesService {
           JSON.stringify(permission),
           this.configService.get('cache.permissionsExpiry'),
         );
-        const [result, p] = await Promise.all([permissions, setPermissions]);
-        console.log({ p });
+        await Promise.all([permissions, setPermissions]);
       }
       await queryRunner.commitTransaction();
 

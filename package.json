@@ -7,10 +7,10 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "nest build",
+    "build": "npm run prebuild && nest build && NODE_ENV=production pm2 start dist/main.js -n hypegenius",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
+    "start": "NODE_ENV=development nest start",
+    "start:dev": "NODE_ENV=development nest start --watch",
     "dev": "npm run start:dev",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -31,6 +31,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/schedule": "^2.2.1",
+    "@nestjs/schedule": "^2.2.1",
     "@nestjs/typeorm": "^9.0.1",
     "bcryptjs": "^2.4.3",
     "cache-manager": "^5.1.7",
@@ -48,12 +49,14 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.9.0",
+    "pm2": "^5.3.0",
     "redis": "^4.6.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "typeorm": "^0.3.12",
-    "typeorm-transactional": "^0.4.1"
+    "typeorm-transactional": "^0.4.1",
+    "url-template": "^3.1.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

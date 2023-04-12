@@ -1,22 +1,15 @@
-import { GetInfluencersReturnType } from './types/index';
-import { plainToInstance } from 'class-transformer';
-import { ConflictException, Injectable } from '@nestjs/common';
-import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
-import BusinessEntity from './entities/business.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateBusinessDto } from './dto/create-business.dto';
-import { BusinessResponse } from './dto/business-response.dto';
-import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
-import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import TagsEntity from '../tags/entities/tags.entity';
+import { Injectable, Logger } from '@nestjs/common';
+
+import { Cron, CronExpression } from '@nestjs/schedule';
 import ContractEntity from '../contract/entities/contract.entity';
-import { AlertType, BusinessChannelType, TagType } from './types';
-import { Alerts } from 'src/constants/alerts';
-import { UpdateBusinessDto } from './dto/update-business.dto';
 
 @Injectable()
-export default class CronJobService {
+export default class BusinessCronService {
+  private readonly logger = new Logger(BusinessCronService.name);
   constructor(
     @InjectRepository(BusinessChannelEntity)
     private businessChannelRepository: Repository<BusinessChannelEntity>,
@@ -27,7 +20,8 @@ export default class CronJobService {
     private contractRepository: Repository<ContractEntity>,
   ) {}
 
-  public async validateVideoCountCronJob() {
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  public async handleCron() {
     const currentDate = new Date();
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);

@@ -1,9 +1,7 @@
 import { CustomRequest } from './../types/index';
 import UserEntity from 'src/app/users/entities/user.entity';
 import { RoleRepository } from './../app/roles/role.repository';
-/* eslint-disable prettier/prettier */
 import {
-  BadRequestException,
   ForbiddenException,
   Injectable,
   MethodNotAllowedException,
@@ -11,14 +9,12 @@ import {
 } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { Request } from 'express';
 import { CacheService } from '../helpers/CacheService';
 import { ResponseMessage } from '../common/messages';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { JwtAccessPayload } from 'src/app/auth/auth.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import ROLES from 'src/constants/roles';
 import BusinessEntity from 'src/app/business/entities/business.entity';
 import ChannelEntity from 'src/app/channels/entities/channels.entity';
 

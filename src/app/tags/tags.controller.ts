@@ -7,11 +7,9 @@ import {
   Param,
   Post,
   Put,
-  Req,
 } from '@nestjs/common';
 import { CreateTagsDto } from './dto/create-tags.dto';
 import TagsService from './tags.service';
-import { Request } from 'express';
 
 @Controller({
   path: '/tags',
@@ -22,8 +20,8 @@ export default class TagsController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('/')
-  async CreateTag(@Body() body: CreateTagsDto, @Req() req: Request) {
-    const response = await this.tagsService.CreateTag({ ...body }, req);
+  async CreateTag(@Body() body: CreateTagsDto) {
+    const response = await this.tagsService.CreateTag(body);
     return { ...response, message: 'Created' };
   }
 

@@ -22,6 +22,7 @@ import { VideoNotificationService, VideoUploadEvent } from './videos.event';
 import { Alerts } from 'src/constants/alerts';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import BusinessChannelAlertVideoEntity from './entities/business_channel_video_alert.entity';
+import ROLES from 'src/constants/roles';
 
 @Injectable()
 export default class VideosService {
@@ -109,14 +110,24 @@ export default class VideosService {
   public async getVideos(
     where: Partial<FindOptionsWhere<VideosEntity>>,
     payload: JwtAccessPayload,
+    fields: string[],
   ) {
     const { business_channel_id, ...restWhere } = where;
     const ids: number[] = [];
     if (!business_channel_id) {
+      const where = {};
+      if (payload.role == ROLES.INFLUENCER) {
+        Object.assign(where, {
+          channelId: payload.channel_id,
+          userId: payload.user_id,
+        });
+      } else if (payload.role === ROLES.BUSINESS_ADMIN) {
+        Object.assign(where, { businessId: payload.business_id });
+      }
       const businessChannels = await this.dataSource
         .getRepository(BusinessChannelEntity)
         .find({
-          where: { channelId: payload.channel_id, userId: payload.user_id },
+          where,
           select: { id: true },
           loadEagerRelations: false,
         });
@@ -126,11 +137,30 @@ export default class VideosService {
         ids.push(business_channel_id);
       }
     }
-    const video_data = await this.videosRepository.find({
-      where: { business_channel_id: In(ids), ...restWhere },
-      loadEagerRelations: false,
-      relations: { payments: true },
-    });
+
+    const videosQuery = this.videosRepository.createQueryBuilder('v');
+    if (fields.includes('payment')) {
+      videosQuery.leftJoinAndSelect('v.payments', 'p');
+    }
+
+    if (fields.includes('influencer')) {
+      videosQuery
+        .leftJoinAndSelect('v.business_channels', 'bc')
+        .leftJoinAndSelect('bc.user', 'u');
+    }
+
+    if (ids.length > 0) {
+      videosQuery.andWhere('v.business_channel_id in (:...ids)', { ids });
+    }
+
+    if (restWhere?.is_payment_due !== undefined) {
+      videosQuery.andWhere('v.is_payment_due = :is_payment_due', {
+        is_payment_due: restWhere.is_payment_due,
+      });
+    }
+
+    const video_data = await videosQuery.getMany();
+
     const links = video_data.map((v) => v.link);
     if (links.length > 0) {
       this.eventEmitter.emit('video.views', new VideoUploadEvent({ links }));
@@ -187,7 +217,7 @@ export default class VideosService {
     }
   }
 
-  public async getNotes(video_id: number, payload: JwtAccessPayload) {
+  public async getNotes(video_id: number) {
     const query = this.dataSource
       .createQueryBuilder()
       .select([

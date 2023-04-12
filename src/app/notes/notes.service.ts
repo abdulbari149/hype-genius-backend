@@ -1,10 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { NotesRepository } from './notes.repository';
-import {
-  CreateBusinessChannelNotesDto,
-  CreateNotesDto,
-} from './dto/create-notes.dto';
+import { CreateBusinessChannelNotesDto } from './dto/create-notes.dto';
 import { DataSource, Repository } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { NotesEntity } from './entities/notes.entity';

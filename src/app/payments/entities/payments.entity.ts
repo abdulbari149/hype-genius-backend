@@ -1,6 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import DefaultEntity from '../../../helpers/default.entity';
-import { payment_status_enums } from 'src/common/enum';
 import CurrencyEntity from 'src/app/currency/entities/currency.entity';
 import VideosEntity from 'src/app/videos/entities/videos.entity';
 import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';

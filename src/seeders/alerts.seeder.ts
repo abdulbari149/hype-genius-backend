@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { AlertsEntity } from 'src/app/alerts/entities/alerts.entity';
 import { Alerts, AlertsPriority } from 'src/constants/alerts';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 
 @Injectable()
 export class AlertsSeeder {

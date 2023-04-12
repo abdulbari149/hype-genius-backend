@@ -7,7 +7,6 @@ import {
   Validate,
 } from 'class-validator';
 import { IsMultipleExist } from '../../../utils/validators/is-multiple-exist.validator';
-import { IsNotExist } from '../../../utils/validators/is-not-exists.validator';
 
 export class CreateRoutesDto {
   @Transform(({ value }) => value.toUpperCase().trim())

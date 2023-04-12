@@ -24,7 +24,6 @@ import { CacheConfigService } from './cache/cache.config';
 import cacheConfig from './config/cache.config';
 import { IsExist } from './utils/validators/is-exists.validator';
 import { IsNotExist } from './utils/validators/is-not-exists.validator';
-import { JwtModule } from '@nestjs/jwt';
 import ContractModule from './app/contract/contract.module';
 import TagsModule from './app/tags/tags.module';
 import BusinessModule from './app/business/business.module';
@@ -36,16 +35,23 @@ import CurrencyModule from './app/currency/currency.module';
 import { AlertsModule } from './app/alerts/alerts.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import PaymentsModule from './app/payments/payments.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
+const envFilePath = path.resolve(
+  __dirname,
+  `../env/${process.env.NODE_ENV}.env`,
+);
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
-      envFilePath: path.resolve(__dirname, '../.env'),
+      envFilePath,
       load: [databaseConfig, appConfig, jwtConfig, cacheConfig],
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -77,6 +83,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     NotesModule,
     AlertsModule,
     ScheduleModule.forRoot(),
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [

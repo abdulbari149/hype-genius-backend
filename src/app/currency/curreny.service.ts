@@ -8,7 +8,7 @@ export default class CurrencyService {
   constructor(
     @InjectRepository(CurrencyEntity)
     private currencyRepository: Repository<CurrencyEntity>,
-  ) {};
+  ) {}
 
   async getAll() {
     return this.currencyRepository.find();

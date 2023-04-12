@@ -1,15 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
-import {
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
-import BusinessEntity from './app/business/entities/business.entity';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/public.decorator';

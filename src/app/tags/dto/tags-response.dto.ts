@@ -1,3 +1,1 @@
-export class TagsResponseDto {
-
-}
+export class TagsResponseDto {}

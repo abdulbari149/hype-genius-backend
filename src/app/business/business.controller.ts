@@ -7,20 +7,22 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Param,
   Put,
+  Query,
   Req,
 } from '@nestjs/common';
 import BusinessService from './business.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import { Payload } from 'src/decorators/payload.decorator';
 import { UpdateBusinessDto } from './dto/update-business.dto';
+import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 
 @Controller({
   path: '/business',
   version: '1',
 })
 export default class BusinessController {
+  constructor(private businessService: BusinessService) {}
   constructor(private businessService: BusinessService) {}
 
   @HttpCode(HttpStatus.OK)
@@ -62,6 +64,36 @@ export default class BusinessController {
     return new ResponseEntity(
       data,
       'Business details Updated successfully',
+      HttpStatus.OK,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/report')
+  async getBusinessReport(
+    @Query() query: GetBusinessReportQueryDto,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const data = await this.businessService.getBusinessReport(
+      payload.business_id,
+      query,
+    );
+    return new ResponseEntity(
+      data,
+      'Report Generated for your business',
+      HttpStatus.OK,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/analytics')
+  async getBusinessAnalytics(@Payload() payload: JwtAccessPayload) {
+    const data = await this.businessService.getBusinessAnalytics(
+      payload.business_id,
+    );
+    return new ResponseEntity(
+      data,
+      'Analytics for your business',
       HttpStatus.OK,
     );
   }

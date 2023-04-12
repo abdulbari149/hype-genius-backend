@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import PaymentsEntity from './entities/payments.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreatePaymentsDto } from './dto/create-payments.dto';
@@ -7,6 +7,8 @@ import { JwtAccessPayload } from '../auth/auth.interface';
 import { plainToInstance } from 'class-transformer';
 import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import VideosEntity from '../videos/entities/videos.entity';
+import BusinessChannelAlertVideoEntity from '../videos/entities/business_channel_video_alert.entity';
+import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 
 @Injectable()
 export default class PaymentsService {
@@ -28,7 +30,6 @@ export default class PaymentsService {
         {
           where: {
             id: body.business_channel_id,
-            channelId: payload.channel_id,
             businessId: payload.business_id,
           },
         },
@@ -42,8 +43,31 @@ export default class PaymentsService {
       await query_runner.manager.update(
         VideosEntity,
         { id: video_id },
-        { payment_id: payment.id },
+        { payment_id: payment.id, is_payment_due: false },
       );
+
+      const business_channel_video_alerts = await query_runner.manager.find(
+        BusinessChannelAlertVideoEntity,
+        {
+          where: { video_id },
+          loadEagerRelations: false,
+        },
+      );
+
+      if (business_channel_video_alerts.length > 0) {
+        const business_channel_alert_ids = business_channel_video_alerts.map(
+          (bcva) => bcva.business_channel_alert_id,
+        );
+        await Promise.all([
+          query_runner.manager.softDelete(BusinessChannelAlertsEntity, {
+            id: In(business_channel_alert_ids),
+          }),
+          query_runner.manager.softDelete(BusinessChannelAlertVideoEntity, {
+            business_channel_alert_id: In(business_channel_alert_ids),
+            video_id,
+          }),
+        ]);
+      }
       await query_runner.commitTransaction();
       return payment;
     } catch (error) {

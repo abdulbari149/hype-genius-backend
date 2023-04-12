@@ -3,7 +3,6 @@ import { DataSource, Repository } from 'typeorm';
 import TagsEntity from './entities/tags.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateTagsDto } from './dto/create-tags.dto';
-import { Request } from 'express';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
@@ -13,7 +12,7 @@ export default class TagsService {
     private tagsRepository: Repository<TagsEntity>,
     private dataSource: DataSource,
   ) {}
-  public async CreateTag(body: CreateTagsDto, req: Request) {
+  public async CreateTag(body: CreateTagsDto) {
     const query_runner = this.dataSource.createQueryRunner();
     await query_runner.startTransaction();
     try {
