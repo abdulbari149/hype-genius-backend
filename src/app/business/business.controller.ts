@@ -1,4 +1,5 @@
 import { JwtAccessPayload } from '../auth/auth.interface';
+import { CronJob } from 'node-cron';
 import { CustomRequest } from './../../types/index';
 import {
   BadRequestException,
@@ -15,13 +16,21 @@ import BusinessService from './business.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import { Payload } from 'src/decorators/payload.decorator';
 import { UpdateBusinessDto } from './dto/update-business.dto';
+import CronJobService from './cron.job.service';
 
 @Controller({
   path: '/business',
   version: '1',
 })
 export default class BusinessController {
-  constructor(private businessService: BusinessService) {}
+  constructor(
+    private businessService: BusinessService,
+    private cronJobService: CronJobService,
+  ) {
+    new CronJob('0 0 1 * *', () => {
+      this.cronJobService.validateVideoCountCronJob();
+    }).start();
+  }
 
   @HttpCode(HttpStatus.OK)
   @Get('/')
