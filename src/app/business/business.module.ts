@@ -10,6 +10,8 @@ import { IsExist } from 'src/utils/validators/is-exists.validator';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import ContractEntity from 'src/app/contract/entities/contract.entity';
 import TagsEntity from 'src/app/tags/entities/tags.entity';
+import UploadFrequencyCronJob from './upload.frequency.cron';
+import CronJobService from './cron.job.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -23,7 +25,7 @@ import TagsEntity from 'src/app/tags/entities/tags.entity';
     forwardRef(() => UserModule),
   ],
   controllers: [BusinessController],
-  providers: [BusinessService, IsExist],
+  providers: [BusinessService, IsExist, UploadFrequencyCronJob, CronJobService],
   exports: [BusinessService],
 })
 export default class BusinessModule {}

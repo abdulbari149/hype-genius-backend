@@ -23,10 +23,11 @@ export default class CronJobService {
     @InjectRepository(TagsEntity)
     private tagsRepository: Repository<TagsEntity>,
     private dataSource: DataSource,
+    @InjectRepository(ContractEntity)
+    private contractRepository: Repository<ContractEntity>,
   ) {}
 
   public async validateVideoCountCronJob() {
-    
     const currentDate = new Date();
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -47,6 +48,19 @@ export default class CronJobService {
       )
       .groupBy('bc.id')
       .getRawMany();
+
+    const contracts = await this.contractRepository.find();
+
+    count.forEach((businessChannel) => {
+      const contract = contracts.find(
+        (c) => c.business_channel_id === businessChannel.business_channel_id,
+      );
+      if (contract && businessChannel.video_count < contract.upload_frequency) {
+        businessChannel.uploadFrequencyMatch = false;
+      } else {
+        businessChannel.isUploadFrequencyMatch = true;
+      }
+    });
 
     return count;
   }
