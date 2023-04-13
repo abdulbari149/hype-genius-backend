@@ -36,7 +36,6 @@ import { AlertsModule } from './app/alerts/alerts.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import PaymentsModule from './app/payments/payments.module';
-import { ScheduleModule } from '@nestjs/schedule';
 
 const envFilePath = path.resolve(
   __dirname,

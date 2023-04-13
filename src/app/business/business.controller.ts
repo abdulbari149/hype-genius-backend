@@ -23,7 +23,6 @@ import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 })
 export default class BusinessController {
   constructor(private businessService: BusinessService) {}
-  constructor(private businessService: BusinessService) {}
 
   @HttpCode(HttpStatus.OK)
   @Get('/')
