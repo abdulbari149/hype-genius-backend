@@ -15,6 +15,8 @@ const envValidationSchema = joi.object().keys({
   JWT_ACCESS_TOKEN_EXPIRES: joi.string().required(),
   JWT_REFRESH_TOKEN_SECRET: joi.string().required(),
   JWT_REFRESH_TOKEN_EXPIRES: joi.string().required(),
+  JWT_ONBOARDING_TOKEN_SECRET: joi.string().required(),
+  JWT_ONBOARDING_TOKEN_EXPIRES: joi.string().required(),
   REDIS_EXPIRY: joi.number().required(),
   REDIS_PERMISSIONS_EXPIRY: joi.number().required(),
   REDIS_URL: joi.string().required(),

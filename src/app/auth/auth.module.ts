@@ -13,11 +13,15 @@ import { JwtStrategy } from 'src/startegies/jwt.startegy';
 import { CacheService } from 'src/helpers/CacheService';
 import { RoleRepository } from '../roles/role.repository';
 import BusinessEntity from '../business/entities/business.entity';
+import BusinessModule from '../business/business.module';
+import ChannelModule from '../channels/channels.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserEntity, BusinessEntity, ChannelEntity]),
     forwardRef(() => UserModule),
+    forwardRef(() => BusinessModule),
+    forwardRef(() => ChannelModule),
     PassportModule,
   ],
   controllers: [AuthController],

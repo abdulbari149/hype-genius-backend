@@ -39,9 +39,13 @@ export class AppController {
     if (isBusinessURL) payload = businessPayload;
     else if (isOnboardingURL) payload = onboardingPayload;
 
+    const secret = this.configService.getOrThrow('jwt.onboarding_first.secret');
+    const expiresIn = this.configService.getOrThrow(
+      'jwt.onboarding_first.expiresIn',
+    );
     const token = await this.jwtService.signAsync(payload, {
-      secret: 'thisisabusinesssecret',
-      expiresIn: '2h',
+      secret,
+      expiresIn,
     });
 
     const url = new URL(

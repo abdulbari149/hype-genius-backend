@@ -18,11 +18,13 @@ import AuthService from './auth.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import AuthRegisterBusinessDto from './dto/auth-register-business.dto';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
-import { Request, Response as ExpressResponse } from 'express';
+import { Request, Response as ExpressResponse, response } from 'express';
 import UserEntity from '../users/entities/user.entity';
 import { Public } from 'src/decorators/public.decorator';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import AuthMeResponse from './dto/auth-me-response.dto';
+import ChannelService from '../channels/channels.service';
+import BusinessService from '../business/business.service';
 
 @Controller({
   path: '/auth',
@@ -32,6 +34,8 @@ export default class AuthController {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,
+    private channelService: ChannelService,
+    private businessService: BusinessService,
   ) {}
 
   @Public()
@@ -71,23 +75,61 @@ export default class AuthController {
       secure: true,
       path: '/',
     });
-    return new ResponseEntity(result, 'Business Registered successfully');
+    res
+      .status(HttpStatus.CREATED)
+      .json(new ResponseEntity(result, 'Business Registered successfully'));
   }
 
   @Public()
-  @HttpCode(HttpStatus.CREATED)
   @Post('/channel/:token')
   async RegisterChannel(
     @Body() data: AuthRegisterChannelDto,
     @Param('token') token: string,
+    @Response() res: ExpressResponse,
   ) {
-    const payload = await this.authService.validateToken(
+    const payload: {
+      businessId: number | undefined;
+      onboardingId: number | undefined;
+    } = await this.authService.validateToken(
       token,
-      'thisisabusinesssecret',
+      this.configService.get('jwt.onboarding_first.secret'),
     );
-    if (!payload.businessId) throw new ForbiddenException('Malformed Token');
+    if (typeof payload?.businessId === 'undefined') {
+      throw new ForbiddenException('Malformed Token');
+    }
     const result = await this.authService.registerChannel(data, payload);
-    return new ResponseEntity(result, 'Influencer Registered Successfully');
+    let status = HttpStatus.CREATED;
+    if (result.isRedirect) {
+      status = HttpStatus.PERMANENT_REDIRECT;
+    }
+    res
+      .status(status)
+      .json(new ResponseEntity(result.data, result.message, status));
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Get('/onboarding/:token')
+  async getPartnerShips(@Param('token') token: string) {
+    const payload = await this.authService.validateSecondOnboardingToken(token);
+    const [currentPartnerShips, newPartnerShip] = await Promise.all([
+      this.channelService.getPartnerShips(payload.userId),
+      this.businessService.getBusiness(payload.businessId),
+    ]);
+    const data = {
+      currentPartnerShips,
+      newPartnerShip,
+    };
+    return new ResponseEntity(data, 'Onboarding Partnerships', HttpStatus.OK);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/onboarding/:token')
+  async onboardNewPartnerShop(@Param('token') token: string) {
+    const payload = await this.authService.validateSecondOnboardingToken(token);
+    const data = await this.authService.onboardNewPartner(payload);
+    return new ResponseEntity(data, 'Onboarding Partnerships', HttpStatus.OK);
   }
 
   @HttpCode(HttpStatus.OK)

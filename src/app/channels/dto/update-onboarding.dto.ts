@@ -1,3 +1,5 @@
+import { OmitType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 import {
   Validate,
   IsNotEmpty,
@@ -9,7 +11,10 @@ import {
   IsPositive,
   IsNotIn,
   IsEnum,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { CreateTagsDto } from 'src/app/tags/dto/create-tags.dto';
 import { MESSAGES } from 'src/common/messages';
 import { UploadFrequencies } from 'src/constants/upload_frequencies';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
@@ -20,6 +25,9 @@ const {
   },
 } = MESSAGES;
 
+class OnboardingTagDto extends OmitType(CreateTagsDto, [
+  'business_channel_id',
+]) {}
 export class UpdateOnboardingDto {
   @Validate(IsExist, ['onboard_requests', 'id'])
   @IsNotEmpty()
@@ -55,4 +63,10 @@ export class UpdateOnboardingDto {
   @IsOptional()
   @IsString()
   note?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OnboardingTagDto)
+  tags?: Array<OnboardingTagDto>;
 }

@@ -8,6 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotAcceptableException,
   NotFoundException,
@@ -46,6 +49,13 @@ const {
     ERROR: {},
   },
 } = MESSAGES;
+
+type OnboardingTokenPayload = {
+  userId?: number;
+  businessId?: number;
+  onboardingId?: number;
+};
+
 @Injectable()
 export default class AuthService {
   constructor(
@@ -61,7 +71,7 @@ export default class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  public async validateToken(token: string, secret: string) {
+  public async validateToken<T>(token: string, secret: string): Promise<T> {
     const payload = await this.jwtService.verifyAsync(token, { secret });
     return payload;
   }
@@ -127,6 +137,7 @@ export default class AuthService {
       manager.findOne(UserEntity, {
         where: { email: data.email },
         loadEagerRelations: false,
+        relations: { role: true },
       }),
       manager.findOne(RoleEntity, {
         where: { role: data.role },
@@ -134,7 +145,12 @@ export default class AuthService {
       }),
       hash(data.password, 10),
     ]);
-    if (user) throw new ConflictException('User already exists');
+    if (user) {
+      return {
+        error: new ConflictException('User already exists'),
+        data: { user, role },
+      };
+    }
     const user_entity = plainToInstance(UserEntity, {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -144,7 +160,7 @@ export default class AuthService {
       password,
     });
     const user_data = await manager.save(user_entity);
-    return { user: user_data, role };
+    return { data: { user: user_data, role }, error: null };
   }
 
   public async registerBusiness(data: AuthRegisterBusinessDto) {
@@ -154,7 +170,10 @@ export default class AuthService {
       const onboardingLink = `${this.configService.get(
         'app.backendDomain',
       )}/${data.businessName.replace(' ', '').trim()}`;
-      const { user, role } = await this.createUser(
+      const {
+        data: { user, role },
+        error,
+      } = await this.createUser(
         {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -165,6 +184,7 @@ export default class AuthService {
         },
         query_runner.manager,
       );
+      if (error) throw error;
 
       const business = await query_runner.manager.findOne(BusinessEntity, {
         where: [{ name: data.businessName }, { onboardingLink }],
@@ -233,6 +253,7 @@ export default class AuthService {
   ) {
     const onboarding = await manager.findOne(OnboardRequestsEntity, {
       where: { id: onboarding_id },
+      loadEagerRelations: false,
     });
     this.validatOnboardingData(onboarding.data);
     const { note = '', ...contract_data } = onboarding.data.contract;
@@ -249,14 +270,103 @@ export default class AuthService {
     await manager.save(business_channel_note_entity);
   }
 
+  public async validateSecondOnboardingToken(token: string) {
+    const payload: OnboardingTokenPayload = await this.validateToken(
+      token,
+      this.configService.get('jwt.onboarding_second.secret'),
+    );
+    if (payload?.businessId === undefined || payload?.userId === undefined) {
+      throw new ForbiddenException('Malformed Token');
+    }
+    return payload;
+  }
+
+  public async onboardNewPartner(payload: OnboardingTokenPayload) {
+    const query_runner = this.dataSource.createQueryRunner();
+    await query_runner.connect();
+    await query_runner.startTransaction();
+    try {
+      const [user, business, channel, missingDealAlert] = await Promise.all([
+        query_runner.manager.findOne(UserEntity, {
+          where: { id: payload.userId },
+          loadEagerRelations: false,
+          relations: { role: true },
+        }),
+        query_runner.manager.findOne(BusinessEntity, {
+          where: { id: payload.businessId },
+          loadEagerRelations: false,
+        }),
+        query_runner.manager.findOne(ChannelEntity, {
+          where: { influencer_id: payload.userId },
+          loadEagerRelations: false,
+        }),
+        query_runner.manager.findOne(AlertsEntity, {
+          where: { name: Alerts.MISSING_DEAL },
+          loadEagerRelations: false,
+        }),
+      ]);
+
+      if (!business) {
+        throw new NotFoundException('business not found');
+      }
+      if (!channel) {
+        throw new NotFoundException('Channel not found');
+      }
+      const business_channel_entity = plainToInstance(BusinessChannelEntity, {
+        businessId: business.id,
+        channelId: channel.id,
+        userId: channel.influencer_id,
+      });
+      const businessChannel = await query_runner.manager.save(
+        business_channel_entity,
+      );
+      if (!payload?.onboardingId) {
+        const alert = plainToInstance(BusinessChannelAlertsEntity, {
+          alert_id: missingDealAlert.id,
+          business_channel_id: businessChannel.id,
+        });
+        await query_runner.manager.save(alert);
+      } else {
+        await this.onboardChannel(
+          query_runner.manager,
+          payload.onboardingId,
+          businessChannel.id,
+        );
+      }
+      const { access_token, refresh_token } = await this.generateTokens({
+        user_id: user.id,
+        role_id: user.roleId,
+        role: user.role.role,
+        channel_id: channel.id,
+      });
+
+      await query_runner.commitTransaction();
+      const response = plainToInstance(AuthRegisterChannelResponse, {
+        user,
+        channel,
+        access_token,
+        refresh_token,
+      });
+      return response;
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      throw error;
+    } finally {
+      await query_runner.release();
+    }
+  }
+
   public async registerChannel(
     data: AuthRegisterChannelDto,
-    payload: { businessId: number; onboardingId?: number },
+    payload: { businessId: number; onboardingId: number },
   ) {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
-      const { user, role } = await this.createUser(
+      const {
+        data: { user, role },
+        error,
+      } = await this.createUser(
         {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -267,16 +377,77 @@ export default class AuthService {
         },
         query_runner.manager,
       );
+      if (error) {
+        const isUserException = error instanceof ConflictException;
+        if (!isUserException) throw error;
+        const userInBusiness = await query_runner.manager.findOne(
+          BusinessChannelEntity,
+          {
+            where: { businessId: payload.businessId, userId: user.id },
+          },
+        );
+
+        if (user.role.role !== role.role) {
+          throw new ForbiddenException(
+            'This email address has been taken by another user with a business account',
+          );
+        }
+        if (userInBusiness) {
+          const url = `${this.configService.get(
+            'app.frontendDomain',
+          )}/auth/login`;
+          await query_runner.commitTransaction();
+          return {
+            isRedirect: true,
+            data: {
+              url,
+            },
+            message:
+              'You are already part of this business. Please login to your account',
+          };
+        }
+        const newPayload: {
+          userId: number;
+          businessId: number;
+          onboardingId?: number;
+        } = {
+          userId: user.id,
+          businessId: payload.businessId,
+        };
+
+        if (payload.onboardingId) {
+          newPayload.onboardingId = payload.onboardingId;
+        }
+        const token = this.jwtService.sign(newPayload, {
+          secret: this.configService.get('jwt.onboarding_second.secret'),
+          expiresIn: this.configService.get('jwt.onboarding_second.expiresIn'),
+        });
+        const url = `${this.configService.get(
+          'app.frontendDomain',
+        )}/auth/signup/onboard?token=${token}`;
+        await query_runner.commitTransaction();
+        return {
+          data: {
+            url,
+          },
+          message:
+            'You are already part of business, Please Join the new buisness',
+          isRedirect: true,
+        };
+      }
 
       const [channel, business, missingDealAlert] = await Promise.all([
         query_runner.manager.findOne(ChannelEntity, {
           where: { name: data.channelName },
+          loadEagerRelations: false,
         }),
         query_runner.manager.findOne(BusinessEntity, {
           where: { id: payload.businessId },
+          loadEagerRelations: false,
         }),
         query_runner.manager.findOne(AlertsEntity, {
           where: { name: Alerts.MISSING_DEAL },
+          loadEagerRelations: false,
         }),
       ]);
       if (!business) {
@@ -321,12 +492,17 @@ export default class AuthService {
       });
 
       await query_runner.commitTransaction();
-      return plainToInstance(AuthRegisterChannelResponse, {
+      const response = plainToInstance(AuthRegisterChannelResponse, {
         user,
         channel: channel_data,
         access_token,
         refresh_token,
       });
+      return {
+        data: response,
+        isRedirect: false,
+        message: 'Influencer Registered successfully',
+      };
     } catch (error) {
       await query_runner.rollbackTransaction();
       throw error;

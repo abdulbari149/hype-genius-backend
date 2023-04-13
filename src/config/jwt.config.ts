@@ -9,4 +9,12 @@ export default registerAs('jwt', () => ({
     secret: process.env.JWT_REFRESH_TOKEN_SECRET,
     expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRES,
   },
+  onboarding_first: {
+    secret: process.env.JWT_ONBOARDING_TOKEN_SECRET,
+    expiresIn: process.env.JWT_ONBOARDING_TOKEN_EXPIRES,
+  },
+  onboarding_second: {
+    secret: process.env.JWT_ONBOARDING_TOKEN_SECRET,
+    expiresIn: process.env.JWT_ONBOARDING_TOKEN_EXPIRES,
+  },
 }));
