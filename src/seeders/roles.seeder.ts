@@ -28,7 +28,12 @@ export class RolesSeeder {
       await rolesRepository
         .createQueryBuilder()
         .insert()
-        .values(plainToInstance(RoleEntity, newroles))
+        .values(
+          plainToInstance(
+            RoleEntity,
+            newroles.map((role) => ({ role })),
+          ),
+        )
         .execute();
     }
   }
