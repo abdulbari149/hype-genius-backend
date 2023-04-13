@@ -8,6 +8,8 @@ import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import { pick } from 'src/utils/pick';
 import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import { BusinessResponse } from '../business/dto/business-response.dto';
+import { JwtAccessPayload } from '../auth/auth.interface';
+import { ContractResponseDto } from '../contract/dto/contract-response.dto';
 @Injectable()
 export default class ChannelService {
   constructor(
@@ -18,6 +20,39 @@ export default class ChannelService {
     @InjectRepository(BusinessChannelEntity)
     private businessChannelRepository: Repository<BusinessChannelEntity>,
   ) {}
+
+  public async getChannelAnalytics(payload: JwtAccessPayload) {
+    const where = {
+      userId: payload.user_id,
+      channelId: payload.channel_id,
+    };
+    const videoQuery = this.businessChannelRepository
+      .createQueryBuilder('bc')
+      .select([
+        'count(v.id) as no_of_uploads',
+        'sum(v.views) as total_views',
+        'sum(p.channel_amount) as amount_earned',
+      ])
+      .innerJoin('bc.videos', 'v')
+      .leftJoin('v.payments', 'p')
+      .where('bc.user_id=:userId and bc.channel_id=:channelId', where);
+    const contractQuery = this.businessChannelRepository
+      .createQueryBuilder('bc')
+      .innerJoinAndSelect('bc.contract', 'c')
+      .where('bc.user_id=:userId and bc.channel_id=:channelId', where);
+    const [videoData, contractData] = await Promise.all([
+      videoQuery.getRawOne(),
+      contractQuery.getMany(),
+    ]);
+    console.log(contractData);
+    return {
+      ...videoData,
+      contracts: plainToInstance(
+        ContractResponseDto,
+        contractData.map((c) => c.contract),
+      ),
+    };
+  }
 
   private async generateOnboardingLink() {
     const retyCount = 5;

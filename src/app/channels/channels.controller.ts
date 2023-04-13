@@ -1,4 +1,4 @@
-import { Controller, Post, Put, Body } from '@nestjs/common';
+import { Controller, Post, Put, Body, Get, HttpStatus } from '@nestjs/common';
 import { Payload } from 'src/decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import ChannelService from './channels.service';
@@ -17,12 +17,22 @@ export default class ChannelController {
     const data = await this.channelService.createOnboarding(
       payload.business_id,
     );
-    return new ResponseEntity(data);
+    return new ResponseEntity(
+      data,
+      'Onboarding created successfully',
+      HttpStatus.CREATED,
+    );
   }
 
   @Put('/influencer/onboarding')
   async updateInfluencerOnboarding(@Body() data: UpdateOnboardingDto) {
     const result = await this.channelService.updateOnboarding(data);
+    return new ResponseEntity(result);
+  }
+
+  @Get('/analytics')
+  async getChannelAnalytics(@Payload() payload: JwtAccessPayload) {
+    const result = await this.channelService.getChannelAnalytics(payload);
     return new ResponseEntity(result);
   }
 }
