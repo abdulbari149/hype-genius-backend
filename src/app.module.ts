@@ -36,6 +36,7 @@ import { AlertsModule } from './app/alerts/alerts.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import PaymentsModule from './app/payments/payments.module';
+import { RolesSeeder } from './seeders/roles.seeder';
 
 const envFilePath = path.resolve(
   __dirname,
@@ -93,6 +94,7 @@ const envFilePath = path.resolve(
     IsNotExist,
     IsMultipleExist,
     AlertsSeeder,
+    RolesSeeder,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -100,9 +102,13 @@ const envFilePath = path.resolve(
   ],
 })
 export class AppModule {
-  constructor(private readonly alertsSeeder: AlertsSeeder) {}
+  constructor(
+    private readonly alertsSeeder: AlertsSeeder,
+    private rolesSeeder: RolesSeeder,
+  ) {}
 
   async onModuleInit() {
+    await this.rolesSeeder.seed();
     await this.alertsSeeder.seed();
   }
 }
