@@ -23,6 +23,7 @@ import { Alerts } from 'src/constants/alerts';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import BusinessChannelAlertVideoEntity from './entities/business_channel_video_alert.entity';
 import ROLES from 'src/constants/roles';
+import { GetVideosQueryDto } from './dto/get-videos-query.dto';
 
 @Injectable()
 export default class VideosService {
@@ -111,6 +112,7 @@ export default class VideosService {
     where: Partial<FindOptionsWhere<VideosEntity>>,
     payload: JwtAccessPayload,
     fields: string[],
+    dateFilters: Pick<GetVideosQueryDto, 'start_date' | 'end_date'>,
   ) {
     const { business_channel_id, ...restWhere } = where;
     const ids: number[] = [];
@@ -156,6 +158,17 @@ export default class VideosService {
     if (restWhere?.is_payment_due !== undefined) {
       videosQuery.andWhere('v.is_payment_due = :is_payment_due', {
         is_payment_due: restWhere.is_payment_due,
+      });
+    }
+    if (dateFilters.start_date !== undefined) {
+      videosQuery.andWhere('CAST(v.created_at as date) >= :start_date', {
+        start_date: dateFilters.start_date,
+      });
+    }
+
+    if (dateFilters.end_date !== undefined) {
+      videosQuery.andWhere('CAST(v.created_at as date) <= :end_date', {
+        end_date: dateFilters.end_date,
       });
     }
 

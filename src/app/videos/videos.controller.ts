@@ -46,6 +46,7 @@ export default class VideosController {
     @Payload() payload?: JwtAccessPayload,
   ) {
     const where: Partial<FindOptionsWhere<VideosEntity>> = {};
+    const dateFilters: Pick<GetVideosQueryDto, 'start_date' | 'end_date'> = {};
     if (typeof query?.business_channel_id !== 'undefined') {
       where.business_channel_id = query.business_channel_id;
     }
@@ -53,11 +54,27 @@ export default class VideosController {
       console.log(query.is_payment_due);
       where.is_payment_due = query.is_payment_due;
     }
+
+    if (typeof query?.start_date !== 'undefined') {
+      console.log(query?.start_date);
+      dateFilters.start_date = query?.start_date;
+    }
+
+    if (typeof query?.end_date !== 'undefined') {
+      console.log(query?.end_date);
+      dateFilters.end_date = query?.end_date;
+    }
+
     const fields = [];
     if (typeof query?.fields !== 'undefined') {
       fields.push(...query.fields);
     }
-    const result = await this.videosService.getVideos(where, payload, fields);
+    const result = await this.videosService.getVideos(
+      where,
+      payload,
+      fields,
+      dateFilters,
+    );
     return new ResponseEntity(result, `Video Uploads List`);
   }
 
