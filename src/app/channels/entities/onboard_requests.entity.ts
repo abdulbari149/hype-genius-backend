@@ -12,7 +12,7 @@ export interface OnboardRequestsData {
   contract?: Empty<
     Pick<
       ContractEntity,
-      'amount' | 'is_one_time' | 'currency_id' | 'upload_frequency'
+      'amount' | 'is_one_time' | 'currency_id' | 'upload_frequency' | 'budget'
     > & { note?: string }
   >;
   tags?: Array<Empty<Pick<TagsEntity, 'name' | 'color' | 'is_activated'>>>;

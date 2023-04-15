@@ -60,7 +60,11 @@ export default class ChannelService {
     let urlExists = false;
     let link = '';
     do {
-      link = `${process.env.BACKEND_DOMAIN}/${Date.now().toString(32)}`;
+      const code = Array(4)
+        .fill(0)
+        .map(() => Math.floor(Math.random() * 100).toString(16))
+        .join('');
+      link = `${process.env.BACKEND_DOMAIN}/${code}`;
       const onboardRequests = await this.onboardRequestsRepository.findOne({
         where: { link },
       });
@@ -95,6 +99,7 @@ export default class ChannelService {
       'currency_id',
       'upload_frequency',
       'note',
+      'budget',
     );
     const tags_data = pick(updated_data, 'tags');
     if (!onboarding_req?.data?.contract) {

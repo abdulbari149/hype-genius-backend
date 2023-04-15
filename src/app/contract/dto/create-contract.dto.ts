@@ -34,6 +34,10 @@ export class CreateContractDto {
 
   @IsNumber()
   @IsNotEmpty()
+  budget: number;
+
+  @IsNumber()
+  @IsNotEmpty()
   @Validate(IsExist, ['currencies', 'id'], {
     message: CURRENCY_NOT_FOUND,
   })

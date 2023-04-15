@@ -96,7 +96,8 @@ export default class BusinessService {
             'uploadFrequency', contract.upload_frequency,
             'createdAt', contract.created_at,
             'updatedAt', contract.updated_at,
-            'deletedAt', contract.deleted_at
+            'deletedAt', contract.deleted_at,
+            'budget', contract.budget
           )
         END as contract`,
       ])

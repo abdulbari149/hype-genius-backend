@@ -47,6 +47,10 @@ export class UpdateOnboardingDto {
 
   @IsOptional()
   @IsNumber()
+  budget?: number;
+
+  @IsOptional()
+  @IsNumber()
   @IsInt()
   @IsPositive()
   @IsNotIn([0])

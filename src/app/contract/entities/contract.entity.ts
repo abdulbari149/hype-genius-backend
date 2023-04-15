@@ -28,6 +28,9 @@ export default class ContractEntity extends DefaultEntity {
   @Column({ name: 'currency_id', type: 'int8', nullable: false })
   currency_id: number;
 
+  @Column({ name: 'budget', type: 'float', nullable: false })
+  budget: number;
+
   @ManyToOne(() => CurrencyEntity, (c) => c.contracts)
   @JoinColumn({ name: 'currency_id', referencedColumnName: 'id' })
   currencies: CurrencyEntity;
