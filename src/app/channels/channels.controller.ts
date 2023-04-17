@@ -33,6 +33,7 @@ export default class ChannelController {
   @Get('/analytics')
   async getChannelAnalytics(@Payload() payload: JwtAccessPayload) {
     const result = await this.channelService.getChannelAnalytics(payload);
+    console.log(result);
     return new ResponseEntity(result);
   }
 }

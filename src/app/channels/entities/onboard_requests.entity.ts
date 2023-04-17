@@ -15,7 +15,7 @@ export interface OnboardRequestsData {
       'amount' | 'is_one_time' | 'currency_id' | 'upload_frequency' | 'budget'
     > & { note?: string }
   >;
-  tags?: Array<Empty<Pick<TagsEntity, 'name' | 'color' | 'is_activated'>>>;
+  tags?: Array<Empty<Pick<TagsEntity, 'text' | 'color' | 'active'>>>;
 }
 
 @Entity('onboard_requests')

@@ -7,6 +7,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Put,
   Query,
   Req,
@@ -16,6 +17,7 @@ import ResponseEntity from 'src/helpers/ResponseEntity';
 import { Payload } from 'src/decorators/payload.decorator';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
+import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';
 
 @Controller({
   path: '/business',
@@ -93,6 +95,25 @@ export default class BusinessController {
     return new ResponseEntity(
       data,
       'Analytics for your business',
+      HttpStatus.OK,
+    );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/metrics/:business_channel_id')
+  async getMetrics(
+    @Payload() payload: JwtAccessPayload,
+    @Param('business_channel_id') business_channel_id: number,
+    @Query() query: GetMetricsQueryDto,
+  ) {
+    const data = await this.businessService.getMetrics(
+      business_channel_id,
+      payload,
+      query,
+    );
+    return new ResponseEntity(
+      data,
+      `Metrics for your business channel id ${business_channel_id}`,
       HttpStatus.OK,
     );
   }

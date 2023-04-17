@@ -9,13 +9,13 @@ const {
 
 export class CreateTagsDto {
   @IsString()
-  name: string;
+  text: string;
 
   @IsString()
   color: string;
 
   @IsBoolean()
-  is_activated: boolean;
+  active: boolean;
 
   @IsNumber()
   @Validate(IsExist, ['business_channel', 'id'], {

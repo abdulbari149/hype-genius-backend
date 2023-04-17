@@ -33,7 +33,7 @@ export default class ChannelService {
         'sum(v.views) as total_views',
         'sum(p.channel_amount) as amount_earned',
       ])
-      .innerJoin('bc.videos', 'v')
+      .leftJoin('bc.videos', 'v')
       .leftJoin('v.payments', 'p')
       .where('bc.user_id=:userId and bc.channel_id=:channelId', where);
     const contractQuery = this.businessChannelRepository
@@ -44,7 +44,7 @@ export default class ChannelService {
       videoQuery.getRawOne(),
       contractQuery.getMany(),
     ]);
-    console.log(contractData);
+    console.log(videoData, contractData);
     return {
       ...videoData,
       contracts: plainToInstance(

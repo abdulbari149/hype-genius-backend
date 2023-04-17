@@ -25,9 +25,7 @@ const {
   },
 } = MESSAGES;
 
-class OnboardingTagDto extends OmitType(CreateTagsDto, [
-  'business_channel_id',
-]) {}
+class TagDto extends OmitType(CreateTagsDto, ['business_channel_id']) {}
 export class UpdateOnboardingDto {
   @Validate(IsExist, ['onboard_requests', 'id'])
   @IsNotEmpty()
@@ -71,6 +69,6 @@ export class UpdateOnboardingDto {
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => OnboardingTagDto)
-  tags?: Array<OnboardingTagDto>;
+  @Type(() => TagDto)
+  tags?: Array<TagDto>;
 }

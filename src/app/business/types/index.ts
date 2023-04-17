@@ -45,8 +45,9 @@ export type AlertType = {
 
 export type TagType = {
   id: number;
-  name: string;
+  text: string;
   color: string;
+  active: number;
   businessChannelId: number;
   createdAt: string;
   updatedAt: string;

@@ -5,11 +5,11 @@ import DefaultEntity from '../../../helpers/default.entity';
 @Entity('tags')
 export default class TagsEntity extends DefaultEntity {
   @Column({
-    name: 'name',
+    name: 'text',
     type: 'varchar',
     nullable: false,
   })
-  name: string;
+  text: string;
 
   @Column({
     name: 'color',
@@ -19,10 +19,10 @@ export default class TagsEntity extends DefaultEntity {
   color: string;
 
   @Column({
-    name: 'is_activated',
+    name: 'active',
     type: 'boolean',
   })
-  is_activated: boolean;
+  active: boolean;
 
   @Column({ name: 'business_channel_id', type: 'int8', nullable: false })
   business_channel_id: number;

@@ -1,6 +1,10 @@
 import { GetInfluencersReturnType, VideoType } from './types/index';
 import { plainToInstance } from 'class-transformer';
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
 import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
 import BusinessEntity from './entities/business.entity';
@@ -16,6 +20,8 @@ import { Alerts } from 'src/constants/alerts';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import VideosEntity from '../videos/entities/videos.entity';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
+import { JwtAccessPayload } from '../auth/auth.interface';
+import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';
 
 @Injectable()
 export default class BusinessService {
@@ -140,7 +146,8 @@ export default class BusinessService {
       .createQueryBuilder('t')
       .select([
         't.id as id',
-        't.name as name',
+        't.text as text',
+        't.active as active',
         't.color as color',
         't.created_at as "createdAt"',
         't.updated_at as "updatedAt"',
@@ -148,8 +155,7 @@ export default class BusinessService {
         't.business_channel_id as "businessChannelId"',
       ])
       .innerJoin('t.business_channels', 'bc')
-      .where('bc.business_id=:businessId', { businessId });
-
+      .where('bc.business_id=:businessId and t.active=true', { businessId });
     const [businessChannels, alerts, tags] = await Promise.all([
       businessChannelsQuery.getRawMany<BusinessChannelType>(),
       alertsQuery.getRawMany<AlertType>(),
@@ -360,7 +366,7 @@ export default class BusinessService {
 
   public async getBusinessAnalytics(businessId: number) {
     const business = await this.getBusiness(businessId);
-    const acrvv = business?.acrvv ? business.acrvv / 100 : 0.003;
+    const acrvv = business?.acrvv ? business.acrvv / 100 : 0.0003;
     const videoAnalyticsQuery = this.videosRepository
       .createQueryBuilder('v')
       .select([
@@ -389,5 +395,69 @@ export default class BusinessService {
       roas: Number(video_data.roas),
       active_partners: Number(channel_data.active_partners),
     };
+  }
+
+  public async getMetrics(
+    business_channel_id: number,
+    payload: JwtAccessPayload,
+    query_params?: GetMetricsQueryDto,
+  ) {
+    const business = await this.businessChannelRepository.findOne({
+      where: {
+        id: business_channel_id,
+        businessId: payload.business_id,
+      },
+      loadEagerRelations: false,
+      relations: {
+        business: true,
+      },
+    });
+
+    if (!business) {
+      throw new NotFoundException(`Influencer doesn't belong to your business`);
+    }
+
+    const acrvv = business.business.acrvv / 100;
+    const customer_ltv = business.business.customer_ltv;
+
+    const query = this.businessChannelRepository
+      .createQueryBuilder('bc')
+      .select([
+        'sum(p.business_amount) as total_spent',
+        'sum(c.budget) as budget',
+        'sum(v."views") as total_views',
+        'count(v.id) as no_of_uploads',
+        `round(avg((v.views::integer * ${acrvv} * ${customer_ltv})/ p.business_amount), 2) as roas`,
+      ])
+      .leftJoin('bc.contract', 'c')
+      .leftJoin('bc.videos', 'v')
+      .leftJoin('bc.payments', 'p')
+      .where('bc.id = :business_channel_id', { business_channel_id });
+
+    if (
+      query_params?.start_date &&
+      typeof query_params?.start_date !== 'undefined'
+    ) {
+      query.andWhere('CAST(v.created_at as date) >= :start_date', {
+        start_date: query_params.start_date,
+      });
+      query.andWhere('CAST(p.created_at as date) >= :start_date', {
+        start_date: query_params.start_date,
+      });
+    }
+
+    if (
+      query_params?.end_date &&
+      typeof query_params?.end_date !== 'undefined'
+    ) {
+      query.andWhere('CAST(v.created_at as date) >= :end_date', {
+        end_date: query_params.end_date,
+      });
+      query.andWhere('CAST(p.created_at as date) >= :start_date', {
+        start_date: query_params.start_date,
+      });
+    }
+    const data = await query.getRawOne();
+    return data;
   }
 }

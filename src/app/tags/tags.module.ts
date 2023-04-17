@@ -6,10 +6,11 @@ import TagsService from './tags.service';
 import UserModule from '../users/user.module';
 import UserEntity from '../users/entities/user.entity';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import BusinessChannelEntity from '../business/entities/business.channel.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TagsEntity, UserEntity]),
+    TypeOrmModule.forFeature([TagsEntity, UserEntity, BusinessChannelEntity]),
     forwardRef(() => UserModule),
   ],
   controllers: [TagsController],
