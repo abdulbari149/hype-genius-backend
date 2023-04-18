@@ -11,6 +11,8 @@ import { Alerts } from 'src/constants/alerts';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import { number } from 'joi';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
+import FollowUpEntity from './entities/follow.up.entity';
+import { plainToClass, plainToInstance } from 'class-transformer';
 
 @Injectable()
 export default class BusinessCronService {
@@ -22,10 +24,12 @@ export default class BusinessCronService {
     private businessChannelAlertsRepository: Repository<BusinessChannelAlertsEntity>,
     @InjectRepository(AlertsEntity)
     private alertsRepository: Repository<AlertsEntity>,
+    @InjectRepository(FollowUpEntity)
+    private followUpRepository: Repository<FollowUpEntity>,
   ) {}
 
   @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
-  public async handleCron() {
+  public async handleUploadFrequencyAlert() {
     const prevMonthDate = moment().subtract(1, 'months');
     const firstDateOfPrevMonth = prevMonthDate
       .startOf('months')
@@ -102,5 +106,41 @@ export default class BusinessCronService {
       }),
     );
     // return count;
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_2AM)
+  async handleFollowUpAlert() {
+    const date = moment().format('YYYY-MM-DD');
+
+    const followUpAlert = await this.alertsRepository.findOne({
+      where: { name: Alerts.FOLLOW_UP },
+      loadEagerRelations: false,
+      select: { id: true },
+    });
+
+    const followUps = await this.followUpRepository.find({
+      where: { schedule_at: date },
+      loadEagerRelations: false,
+    });
+
+    await Promise.all(
+      followUps
+        .filter((followUp) => !followUp.business_channel_alert_id)
+        .map((followUp) => {
+          return new Promise(async () => {
+            const alert = plainToInstance(BusinessChannelAlertsEntity, {
+              business_channel_id: followUp.business_channel_id,
+              alert_id: followUpAlert.id,
+            });
+            const business_channel_alert =
+              await this.businessChannelAlertsRepository.save(alert);
+            const updated_followup_data = plainToInstance(FollowUpEntity, {
+              ...followUp,
+              business_channel_alert_id: business_channel_alert.id,
+            });
+            this.followUpRepository.save(updated_followup_data);
+          });
+        }),
+    );
   }
 }

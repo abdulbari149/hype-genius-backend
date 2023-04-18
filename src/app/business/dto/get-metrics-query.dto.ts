@@ -1,11 +1,12 @@
-import { IsDateString, IsOptional } from 'class-validator';
+import { IsOptional, Validate } from 'class-validator';
+import { IsOnlyDate } from 'src/utils/validators/is-only-date.validator';
 
 export class GetMetricsQueryDto {
-  @IsDateString()
+  @Validate(IsOnlyDate)
   @IsOptional()
-  start_date?: Date;
+  start_date?: string;
 
-  @IsDateString()
+  @Validate(IsOnlyDate)
   @IsOptional()
-  end_date?: Date;
+  end_date?: string;
 }

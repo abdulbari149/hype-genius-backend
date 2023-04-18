@@ -13,6 +13,7 @@ import TagsEntity from 'src/app/tags/entities/tags.entity';
 import VideosEntity from '../videos/entities/videos.entity';
 import BusinessCronService from './business.cron';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
+import FollowUpEntity from './entities/follow.up.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -24,6 +25,7 @@ import { AlertsEntity } from '../alerts/entities/alerts.entity';
       ContractEntity,
       VideosEntity,
       AlertsEntity,
+      FollowUpEntity,
     ]),
     forwardRef(() => UserModule),
   ],

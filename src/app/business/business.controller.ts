@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Post,
   Put,
   Query,
   Req,
@@ -18,6 +19,7 @@ import { Payload } from 'src/decorators/payload.decorator';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';
+import CreateFollowUpDto from './dto/create-followup.dto';
 
 @Controller({
   path: '/business',
@@ -115,6 +117,20 @@ export default class BusinessController {
       data,
       `Metrics for your business channel id ${business_channel_id}`,
       HttpStatus.OK,
+    );
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/followup')
+  async createFollowUp(
+    @Body() body: CreateFollowUpDto,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const result = await this.businessService.createFollowUp(body, payload);
+    return new ResponseEntity(
+      result,
+      'Followup created successfully',
+      HttpStatus.CREATED,
     );
   }
 }

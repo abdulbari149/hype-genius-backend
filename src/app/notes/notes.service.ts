@@ -68,6 +68,7 @@ export class NotesService {
         where: { business_channel_id },
         loadEagerRelations: false,
         relations: { notes: true },
+        order: { createdAt: 'DESC' },
       },
     );
     const data = businessChannelNotes.map((businessChannelNote) => ({

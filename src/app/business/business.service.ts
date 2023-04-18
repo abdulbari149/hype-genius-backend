@@ -22,6 +22,10 @@ import VideosEntity from '../videos/entities/videos.entity';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';
+import CreateFollowUpDto from './dto/create-followup.dto';
+import FollowUpEntity from './entities/follow.up.entity';
+import { NotesEntity } from '../notes/entities/notes.entity';
+import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
 
 @Injectable()
 export default class BusinessService {
@@ -454,10 +458,61 @@ export default class BusinessService {
         end_date: query_params.end_date,
       });
       query.andWhere('CAST(p.created_at as date) >= :start_date', {
-        start_date: query_params.start_date,
+        start_date: query_params.end_date,
       });
     }
     const data = await query.getRawOne();
     return data;
+  }
+
+  public async createFollowUp(
+    data: CreateFollowUpDto,
+    payload: JwtAccessPayload,
+  ) {
+    const query_runner = this.dataSource.createQueryRunner();
+    try {
+      await query_runner.startTransaction();
+      const business_channel = await query_runner.manager.findOne(
+        BusinessChannelEntity,
+        {
+          where: {
+            id: data.business_channel_id,
+            businessId: payload.business_id,
+          },
+          loadEagerRelations: false,
+        },
+      );
+      if (!business_channel) {
+        throw new NotFoundException('Business channel doesnt belong to you');
+      }
+
+      const followUpEntity = plainToInstance(FollowUpEntity, {
+        schedule_at: data.schedule_at,
+        business_channel_id: data.business_channel_id,
+        send_to: data.send_to,
+      });
+      const noteEntity = plainToInstance(NotesEntity, {
+        body: data.info,
+      });
+      const [, note] = await Promise.all([
+        query_runner.manager.save(followUpEntity),
+        query_runner.manager.save(noteEntity),
+      ]);
+      const businessChannelNoteEntity = plainToInstance(
+        BusinessChannelNotesEntity,
+        {
+          note_id: note.id,
+          pinned: true,
+          business_channel_id: business_channel.id,
+        },
+      );
+      await query_runner.manager.save(businessChannelNoteEntity);
+      await query_runner.commitTransaction();
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      throw error;
+    } finally {
+      await query_runner.release();
+    }
   }
 }

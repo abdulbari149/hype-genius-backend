@@ -3,6 +3,7 @@ import BusinessChannelEntity from 'src/app/business/entities/business.channel.en
 import { AlertsEntity } from './alerts.entity';
 import DefaultEntity from 'src/helpers/default.entity';
 import BusinessChannelAlertVideoEntity from 'src/app/videos/entities/business_channel_video_alert.entity';
+import FollowUpEntity from 'src/app/business/entities/follow.up.entity';
 
 @Entity('business_channel_alert')
 export class BusinessChannelAlertsEntity extends DefaultEntity {
@@ -29,4 +30,10 @@ export class BusinessChannelAlertsEntity extends DefaultEntity {
       businessChannelAlertVideo.business_channel_alert,
   )
   business_channel_alert_video: BusinessChannelAlertVideoEntity[];
+
+  @OneToMany(
+    () => FollowUpEntity,
+    (followUp) => followUp.business_channel_alert,
+  )
+  follow_ups: FollowUpEntity[];
 }
