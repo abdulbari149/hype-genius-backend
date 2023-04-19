@@ -7,10 +7,10 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import BusinessChannelEntity from './business.channel.entity';
-import OnboardRequestsEntity from 'src/app/channels/entities/onboard_requests.entity';
-import CurrencyEntity from 'src/app/currency/entities/currency.entity';
+import OnboardRequestsEntity from '../../channels/entities/onboard_requests.entity';
+import CurrencyEntity from '../../currency/entities/currency.entity';
 
 @Entity('business')
 export default class BusinessEntity extends DefaultEntity {

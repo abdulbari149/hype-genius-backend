@@ -1,8 +1,8 @@
-import ContractEntity from 'src/app/contract/entities/contract.entity';
-import PaymentsEntity from 'src/app/payments/entities/payments.entity';
+import ContractEntity from '../../contract/entities/contract.entity';
+import PaymentsEntity from '../../payments/entities/payments.entity';
 import { Entity, Column, OneToMany } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
-import BusinessEntity from 'src/app/business/entities/business.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import BusinessEntity from '../../business/entities/business.entity';
 
 @Entity('currencies')
 export default class CurrencyEntity extends DefaultEntity {

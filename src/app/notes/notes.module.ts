@@ -1,4 +1,4 @@
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
+import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotesController } from './notes.controller';

@@ -1,0 +1,199 @@
+[
+  {
+    "roles": [
+      "influencer",
+      "business_admin",
+      "superadmin"
+    ],
+    "end_point": "/api/v1/auth/me",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/influencers",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/current",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin",
+      "superadmin"
+    ],
+    "end_point": "/api/v1/roles",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer",
+      "business_admin",
+      "superadmin"
+    ],
+    "end_point": "/api/v1/business",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer",
+      "business_admin",
+      "superadmin"
+    ],
+    "end_point": "/api/v1/videos",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer"
+    ],
+    "end_point": "/api/v1/videos",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "influencer"
+    ],
+    "end_point": "/api/v1/videos/:id/note",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer"
+    ],
+    "end_point": "/api/v1/videos/:id/note",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/channels/influencer/onboarding",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/channels/influencer/onboarding",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/channels/influencer/onboarding",
+    "request_type": "PUT"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/notes/:business_channel_id",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/notes/:business_channel_id",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/alerts",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/contracts",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/contracts/:id",
+    "request_type": "PUT"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/payments",
+    "request_type": "POST"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business",
+    "request_type": "PUT"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/report",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/analytics",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer"
+    ],
+    "end_point": "/api/v1/channels/analytics",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "influencer",
+      "business_admin"
+    ],
+    "end_point": "/api/v1/users",
+    "request_type": "PUT"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/metrics/:business_channel_id",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/tags",
+    "request_type": "GET"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/tags",
+    "request_type": "PUT"
+  },
+  {
+    "roles": [
+      "business_admin"
+    ],
+    "end_point": "/api/v1/business/followup",
+    "request_type": "POST"
+  }
+]

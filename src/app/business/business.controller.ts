@@ -20,6 +20,7 @@ import { UpdateBusinessDto } from './dto/update-business.dto';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';
 import CreateFollowUpDto from './dto/create-followup.dto';
+import { GetChartsDataQueryDto } from './dto/get-charts-query.dto';
 
 @Controller({
   path: '/business',
@@ -28,6 +29,9 @@ import CreateFollowUpDto from './dto/create-followup.dto';
 export default class BusinessController {
   constructor(private businessService: BusinessService) {}
 
+  // TODO: for super admin returns all business
+  // TODO: for business admin return his business
+  // TODO: for influencer return influencers businesses;
   @HttpCode(HttpStatus.OK)
   @Get('/')
   async getBusiness(@Payload() payload: JwtAccessPayload) {
@@ -132,5 +136,15 @@ export default class BusinessController {
       'Followup created successfully',
       HttpStatus.CREATED,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('/chart')
+  async getChartData(
+    @Query() query: GetChartsDataQueryDto,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const data = await this.businessService.getChartData(payload, query);
+    return new ResponseEntity(data, 'Charts data', HttpStatus.OK);
   }
 }

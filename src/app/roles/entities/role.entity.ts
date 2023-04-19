@@ -1,6 +1,6 @@
-import { RoutePermissionsEntity } from 'src/app/route_permission/entities/route-permission.entity';
-import UserEntity from 'src/app/users/entities/user.entity';
-import DefaultEntity from 'src/helpers/default.entity';
+import { RoutePermissionsEntity } from '../../route_permission/entities/route-permission.entity';
+import UserEntity from '../../users/entities/user.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity({ name: 'roles' })

@@ -1,6 +1,6 @@
-import { NotesEntity } from 'src/app/notes/entities/notes.entity';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
-import DefaultEntity from 'src/helpers/default.entity';
+import { NotesEntity } from '../../notes/entities/notes.entity';
+import BusinessChannelEntity from '../../business/entities/business.channel.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity('business_channel_notes')

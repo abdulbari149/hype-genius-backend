@@ -1,5 +1,5 @@
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
+import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import TagsEntity from '../tags/entities/tags.entity';
 import { Injectable, Logger } from '@nestjs/common';

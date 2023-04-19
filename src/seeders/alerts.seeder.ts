@@ -1,13 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { AlertsEntity } from 'src/app/alerts/entities/alerts.entity';
-import { Alerts, AlertsPriority } from 'src/constants/alerts';
-import { DataSource, In } from 'typeorm';
-
-@Injectable()
-export class AlertsSeeder {
-  constructor(private readonly dataSource: DataSource) {}
-
-  async seed() {
+import { plainToInstance } from 'class-transformer';
+import { AlertsEntity } from '../app/alerts/entities/alerts.entity';
+import { Alerts, AlertsPriority } from '../constants/alerts';
+import { DataSource } from 'typeorm';
+import { Factory, Seeder } from 'typeorm-seeding';
+export class AlertsSeeder implements Seeder {
+  async run(factory: Factory, dataSource: DataSource) {
     const alerts = [
       {
         name: Alerts.MISSING_DEAL,
@@ -36,27 +33,17 @@ export class AlertsSeeder {
       },
     ];
 
-    const alertsRepository = this.dataSource.getRepository(AlertsEntity);
-
-    const existingAlerts = await alertsRepository.find({
-      where: {
-        name: In(alerts.map((alert) => alert.name)),
-      },
-      loadEagerRelations: false,
-    });
-    const newAlerts = alerts.filter(
-      (alert) =>
-        !existingAlerts.some(
-          (existingAlert) => existingAlert.name === alert.name,
-        ),
-    );
-
-    if (newAlerts.length) {
-      await alertsRepository
-        .createQueryBuilder()
-        .insert()
-        .values(newAlerts)
-        .execute();
+    const query_runner = dataSource.createQueryRunner();
+    try {
+      await query_runner.startTransaction();
+      const alerts_entity = plainToInstance(AlertsEntity, alerts);
+      query_runner.manager.save(alerts_entity);
+      await query_runner.commitTransaction();
+    } catch (error) {
+      await query_runner.rollbackTransaction();
+      throw error;
+    } finally {
+      await query_runner.release();
     }
   }
 }

@@ -1,9 +1,9 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
+import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 import { AlertsEntity } from './alerts.entity';
-import DefaultEntity from 'src/helpers/default.entity';
-import BusinessChannelAlertVideoEntity from 'src/app/videos/entities/business_channel_video_alert.entity';
-import FollowUpEntity from 'src/app/business/entities/follow.up.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import BusinessChannelAlertVideoEntity from '../../videos/entities/business_channel_video_alert.entity';
+import FollowUpEntity from '../../business/entities/follow.up.entity';
 
 @Entity('business_channel_alert')
 export class BusinessChannelAlertsEntity extends DefaultEntity {

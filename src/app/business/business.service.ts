@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource, Repository, SelectQueryBuilder } from 'typeorm';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
+import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import BusinessEntity from './entities/business.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBusinessDto } from './dto/create-business.dto';
@@ -26,6 +26,7 @@ import CreateFollowUpDto from './dto/create-followup.dto';
 import FollowUpEntity from './entities/follow.up.entity';
 import { NotesEntity } from '../notes/entities/notes.entity';
 import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
+import { GetChartsDataQueryDto } from './dto/get-charts-query.dto';
 
 @Injectable()
 export default class BusinessService {
@@ -282,6 +283,20 @@ export default class BusinessService {
         { business_channel_id: query.business_channel_id },
       );
     }
+
+    // if (query?.start_date && typeof query?.start_date !== 'undefined') {
+    //   businessChannelsQuery = businessChannelsQuery.andWhere(
+    //     'bc.created_at >= :start_date',
+    //     { start_date: query.start_date },
+    //   );
+    // }
+
+    // if (query?.end_date && typeof query?.end_date !== 'undefined') {
+    //   businessChannelsQuery = businessChannelsQuery.andWhere(
+    //     'bc.created_at >= :end_date',
+    //     { end_date: query.end_date },
+    //   );
+    // }
     const businessChannelCount = await businessChannelsQuery.getCount();
 
     const totalNoOfPages = Math.ceil(businessChannelCount / pagination.size);
@@ -299,7 +314,7 @@ export default class BusinessService {
     const businessChannelReportPromises = businessChannels.map((bc) => {
       return new Promise(async (resolve, reject) => {
         try {
-          const videos = await this.videosRepository
+          let videosQuery = this.videosRepository
             .createQueryBuilder('v')
             .select([
               'v.id as id',
@@ -322,8 +337,32 @@ export default class BusinessService {
               bc_id: bc.id,
               acrvv: business.acrvv / 100,
               customer_ltv: parseInt(business.customer_ltv.toString(), 10),
-            })
-            .getRawMany<VideoType>();
+            });
+
+          if (query?.start_date && typeof query?.start_date !== 'undefined') {
+            videosQuery = videosQuery.andWhere(
+              'CAST(v.created_at as date) >= :start_date',
+              {
+                start_date: query.start_date,
+              },
+            );
+            // videosQuery.andWhere('CAST(p.created_at as date) >= :start_date', {
+            //   start_date: query.start_date,
+            // });
+          }
+
+          if (query?.end_date && typeof query?.end_date !== 'undefined') {
+            videosQuery = videosQuery.andWhere(
+              'CAST(v.created_at as date) >= :end_date',
+              {
+                end_date: query.end_date,
+              },
+            );
+            // videosQuery.andWhere('CAST(p.created_at as date) >= :start_date', {
+            //   start_date: query.end_date,
+            // });
+          }
+          const videos = await videosQuery.getRawMany<VideoType>();
           const data = videos.reduce(
             (acc, video) => {
               return {
@@ -514,5 +553,15 @@ export default class BusinessService {
     } finally {
       await query_runner.release();
     }
+  }
+
+  public async getChartData(
+    payload: JwtAccessPayload,
+    query: GetChartsDataQueryDto,
+  ) {
+    this.businessChannelRepository
+      .createQueryBuilder('bc')
+      .select(['count(bc.id) as active_partners'])
+      .where('bc.business_id=:businessId', { businessId: payload.business_id });
   }
 }

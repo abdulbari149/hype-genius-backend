@@ -1,8 +1,8 @@
 import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
-import PaymentsEntity from 'src/app/payments/entities/payments.entity';
-import { VideoNotesEntity } from 'src/app/notes/entities/video_notes.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import PaymentsEntity from '../../payments/entities/payments.entity';
+import { VideoNotesEntity } from '../../notes/entities/video_notes.entity';
 import BusinessChannelAlertVideoEntity from './business_channel_video_alert.entity';
 
 @Entity('videos')

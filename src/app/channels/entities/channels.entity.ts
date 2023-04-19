@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import DefaultEntity from 'src/helpers/default.entity';
-import UserEntity from 'src/app/users/entities/user.entity';
-import BusinessChannelsEntity from 'src/app/business/entities/business.channel.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import UserEntity from '../../users/entities/user.entity';
+import BusinessChannelsEntity from '../../business/entities/business.channel.entity';
 
 @Entity('channels')
 export default class ChannelEntity extends DefaultEntity {

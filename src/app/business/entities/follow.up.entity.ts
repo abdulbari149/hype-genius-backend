@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import BusinessChannelEntity from './business.channel.entity';
-import { BusinessChannelAlertsEntity } from 'src/app/alerts/entities/business_channel_alerts.entity';
+import { BusinessChannelAlertsEntity } from '../../alerts/entities/business_channel_alerts.entity';
 import { SendTo } from '../dto/create-followup.dto';
 
 @Entity('follow_ups')

@@ -1,8 +1,8 @@
 import { Entity, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
-import CurrencyEntity from 'src/app/currency/entities/currency.entity';
-import VideosEntity from 'src/app/videos/entities/videos.entity';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import CurrencyEntity from '../../currency/entities/currency.entity';
+import VideosEntity from '../../videos/entities/videos.entity';
+import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 
 @Entity('payments')
 export default class PaymentsEntity extends DefaultEntity {

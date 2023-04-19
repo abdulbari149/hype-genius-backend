@@ -1,6 +1,6 @@
 import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 
 @Entity('tags')
 export default class TagsEntity extends DefaultEntity {

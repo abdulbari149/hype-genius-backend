@@ -5,8 +5,6 @@ const envFilePath = resolve(__dirname, `../env/${process.env.NODE_ENV}.env`);
 config({
   path: envFilePath,
 });
-
-/* eslint-disable prettier/prettier */
 module.exports = {
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -14,6 +12,7 @@ module.exports = {
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  migrations: ['/dist/migrations/*{.ts,.js}'],
+  migrations: ['src/migrations/*{.ts,.js}'],
   entities: ['src/app/**/*.entity.{ts,js}'],
+  seeds: ['src/seeders/*.seeder{.ts,.js}'],
 };

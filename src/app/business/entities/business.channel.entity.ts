@@ -8,15 +8,15 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import DefaultEntity from 'src/helpers/default.entity';
-import ChannelsEntity from 'src/app/channels/entities/channels.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import ChannelsEntity from '../../channels/entities/channels.entity';
 import BusinessEntity from './business.entity';
 import FollowUpEntity from './follow.up.entity';
-import TagsEntity from 'src/app/tags/entities/tags.entity';
-import VideosEntity from 'src/app/videos/entities/videos.entity';
-import { BusinessChannelNotesEntity } from 'src/app/notes/entities/business_channel_notes.entity';
-import { BusinessChannelAlertsEntity } from 'src/app/alerts/entities/business_channel_alerts.entity';
-import PaymentsEntity from 'src/app/payments/entities/payments.entity';
+import TagsEntity from '../../tags/entities/tags.entity';
+import VideosEntity from '../../videos/entities/videos.entity';
+import { BusinessChannelNotesEntity } from '../../notes/entities/business_channel_notes.entity';
+import { BusinessChannelAlertsEntity } from '../../alerts/entities/business_channel_alerts.entity';
+import PaymentsEntity from '../../payments/entities/payments.entity';
 
 @Entity('business_channel')
 export default class BusinessChannelEntity extends DefaultEntity {

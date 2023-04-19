@@ -1,8 +1,8 @@
-import BusinessChannelsEntity from 'src/app/business/entities/business.channel.entity';
-import BusinessEntity from 'src/app/business/entities/business.entity';
-import ChannelsEntity from 'src/app/channels/entities/channels.entity';
-import { RoleEntity } from 'src/app/roles/entities/role.entity';
-import DefaultEntity from 'src/helpers/default.entity';
+import BusinessChannelsEntity from '../../business/entities/business.channel.entity';
+import BusinessEntity from '../../business/entities/business.entity';
+import ChannelsEntity from '../../channels/entities/channels.entity';
+import { RoleEntity } from '../../roles/entities/role.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import {
   Column,
   Entity,

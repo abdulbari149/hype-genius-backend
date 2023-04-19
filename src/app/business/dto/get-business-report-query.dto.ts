@@ -8,6 +8,7 @@ import {
   Validate,
 } from 'class-validator';
 import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { IsOnlyDate } from 'src/utils/validators/is-only-date.validator';
 
 export class GetBusinessReportQueryDto {
   @Validate(IsExist, ['business_channel', 'id'])
@@ -23,13 +24,13 @@ export class GetBusinessReportQueryDto {
   })
   report_for_all?: boolean;
 
-  @IsDateString()
+  @Validate(IsOnlyDate)
   @IsOptional()
-  start_date?: Date;
+  start_date?: string;
 
-  @IsDateString()
+  @Validate(IsOnlyDate)
   @IsOptional()
-  end_date?: Date;
+  end_date?: string;
 
   @IsOptional()
   @IsNumber()

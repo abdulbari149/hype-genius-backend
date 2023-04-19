@@ -139,16 +139,26 @@ export default class VideosService {
         ids.push(business_channel_id);
       }
     }
-
-    const videosQuery = this.videosRepository.createQueryBuilder('v');
+    const videosQuery = this.videosRepository
+      .createQueryBuilder('v')
+      .leftJoinAndSelect('v.business_channels', 'bc');
     if (fields.includes('payment')) {
       videosQuery.leftJoinAndSelect('v.payments', 'p');
     }
 
     if (fields.includes('influencer')) {
-      videosQuery
-        .leftJoinAndSelect('v.business_channels', 'bc')
-        .leftJoinAndSelect('bc.user', 'u');
+      videosQuery.leftJoinAndSelect('bc.user', 'u');
+    }
+
+    if (payload.role === ROLES.BUSINESS_ADMIN) {
+      videosQuery.andWhere('bc.business_id=:business_id', {
+        business_id: payload.business_id,
+      });
+    } else if (payload.role === ROLES.INFLUENCER) {
+      videosQuery.andWhere(
+        'bc.user_id=:user_id and bc.channel_id=:channel_id',
+        { user_id: payload.user_id, channel_id: payload.channel_id },
+      );
     }
 
     if (ids.length > 0) {

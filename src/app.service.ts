@@ -1,4 +1,4 @@
-import OnboardRequestsEntity from 'src/app/channels/entities/onboard_requests.entity';
+import OnboardRequestsEntity from './app/channels/entities/onboard_requests.entity';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';

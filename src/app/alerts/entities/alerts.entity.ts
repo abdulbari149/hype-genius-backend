@@ -1,4 +1,4 @@
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BusinessChannelAlertsEntity } from './business_channel_alerts.entity';
 

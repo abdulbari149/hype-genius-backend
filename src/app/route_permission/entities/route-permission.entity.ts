@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { RoutesEntity } from '../../routes/entities/route.entity';
 import { RoleEntity } from '../../roles/entities/role.entity';
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 
 @Entity('route_permissions')
 export class RoutePermissionsEntity extends DefaultEntity {

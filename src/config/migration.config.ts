@@ -1,11 +1,13 @@
 import { resolve } from 'path';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-const envFilePath = resolve(__dirname, `../env/${process.env.NODE_ENV}.env`);
-
+const envFilePath = resolve(__dirname, `../../env/${process.env.NODE_ENV}.env`);
+console.log(envFilePath);
 config({
   path: envFilePath,
 });
+
+console.log(process.env);
 
 export const app_data_source = new DataSource({
   type: 'postgres',
@@ -14,7 +16,7 @@ export const app_data_source = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: ['src/**/**.entity{.ts,.js}'],
+  entities: [resolve(__dirname, '../app/**/**/*.entity{.ts,.js}')],
   migrations: ['src/migrations/*.{ts,js}'],
 });
 app_data_source.initialize();

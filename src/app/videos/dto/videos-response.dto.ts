@@ -5,10 +5,10 @@ import {
   Type,
   plainToInstance,
 } from 'class-transformer';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
-import { PaymentsResponseDto } from 'src/app/payments/dto/payments-response.dto';
-import PaymentsEntity from 'src/app/payments/entities/payments.entity';
-import UserResponse from 'src/app/users/dto/user-response.dto';
+import BusinessChannelEntity from '../../business/entities/business.channel.entity';
+import { PaymentsResponseDto } from '../../payments/dto/payments-response.dto';
+import PaymentsEntity from '../../payments/entities/payments.entity';
+import UserResponse from '../../users/dto/user-response.dto';
 
 @Exclude()
 export class VideosResponseDto {

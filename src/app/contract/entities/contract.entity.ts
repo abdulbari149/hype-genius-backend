@@ -1,8 +1,8 @@
 import BusinessChannelEntity from '../../business/entities/business.channel.entity';
 import CurrencyEntity from '../../currency/entities/currency.entity';
 import { Entity, Column, ManyToOne, JoinColumn, OneToOne } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
-import { UploadFrequencies } from 'src/constants/upload_frequencies';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import { UploadFrequencies } from '../../../constants/upload_frequencies';
 
 @Entity('contracts')
 export default class ContractEntity extends DefaultEntity {

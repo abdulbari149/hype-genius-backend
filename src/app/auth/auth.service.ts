@@ -1,8 +1,8 @@
-import TagsEntity from 'src/app/tags/entities/tags.entity';
-import ContractEntity from 'src/app/contract/entities/contract.entity';
-import BusinessChannelEntity from 'src/app/business/entities/business.channel.entity';
-import ChannelEntity from 'src/app/channels/entities/channels.entity';
-import { RoleEntity } from 'src/app/roles/entities/role.entity';
+import TagsEntity from '../tags/entities/tags.entity';
+import ContractEntity from '../contract/entities/contract.entity';
+import BusinessChannelEntity from '../business/entities/business.channel.entity';
+import ChannelEntity from '../channels/entities/channels.entity';
+import { RoleEntity } from '../roles/entities/role.entity';
 import { Repository, DataSource, EntityManager } from 'typeorm';
 import UserEntity from '../users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -483,7 +483,10 @@ export default class AuthService {
         business_channel_entity,
       );
 
-      if (!payload?.onboardingId) {
+      if (
+        payload?.onboardingId === undefined ||
+        payload?.onboardingId === null
+      ) {
         const alert = plainToInstance(BusinessChannelAlertsEntity, {
           alert_id: missingDealAlert.id,
           business_channel_id: businessChannel.id,

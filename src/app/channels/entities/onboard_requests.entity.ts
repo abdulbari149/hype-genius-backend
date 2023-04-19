@@ -1,8 +1,8 @@
-import TagsEntity from 'src/app/tags/entities/tags.entity';
-import ContractEntity from 'src/app/contract/entities/contract.entity';
+import TagsEntity from '../../tags/entities/tags.entity';
+import ContractEntity from '../../contract/entities/contract.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import DefaultEntity from 'src/helpers/default.entity';
-import BusinessEntity from 'src/app/business/entities/business.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
+import BusinessEntity from '../../business/entities/business.entity';
 
 type Empty<T> = {
   [P in keyof T]?: T[P] | null | undefined;

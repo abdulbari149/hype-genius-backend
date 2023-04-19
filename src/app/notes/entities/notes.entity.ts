@@ -1,4 +1,4 @@
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BusinessChannelNotesEntity } from './business_channel_notes.entity';
 import { VideoNotesEntity } from './video_notes.entity';

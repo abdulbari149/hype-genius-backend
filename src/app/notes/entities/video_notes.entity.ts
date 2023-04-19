@@ -1,7 +1,7 @@
-import DefaultEntity from 'src/helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { NotesEntity } from './notes.entity';
-import VideosEntity from 'src/app/videos/entities/videos.entity';
+import VideosEntity from '../../videos/entities/videos.entity';
 
 @Entity('video_notes')
 export class VideoNotesEntity extends DefaultEntity {

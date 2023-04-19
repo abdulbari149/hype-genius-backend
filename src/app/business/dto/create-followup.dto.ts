@@ -5,8 +5,8 @@ import {
   IsString,
   Validate,
 } from 'class-validator';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
-import { IsOnlyDate } from 'src/utils/validators/is-only-date.validator';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
+import { IsOnlyDate } from '../../../utils/validators/is-only-date.validator';
 
 export enum SendTo {
   EMAIL = 'email',

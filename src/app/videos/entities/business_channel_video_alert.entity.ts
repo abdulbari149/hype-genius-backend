@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
-import DefaultEntity from '../../../helpers/default.entity';
+import DefaultEntity from '../../../helpers/DefaultEntity';
 import { BusinessChannelAlertsEntity } from '../../alerts/entities/business_channel_alerts.entity';
 import VideosEntity from './videos.entity';
 
