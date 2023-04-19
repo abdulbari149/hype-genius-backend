@@ -479,26 +479,24 @@ export default class BusinessService {
 
     if (
       query_params?.start_date &&
-      typeof query_params?.start_date !== 'undefined'
-    ) {
-      query.andWhere('CAST(v.created_at as date) >= :start_date', {
-        start_date: query_params.start_date,
-      });
-      query.andWhere('CAST(p.created_at as date) >= :start_date', {
-        start_date: query_params.start_date,
-      });
-    }
-
-    if (
+      typeof query_params?.start_date !== 'undefined' &&
       query_params?.end_date &&
       typeof query_params?.end_date !== 'undefined'
     ) {
-      query.andWhere('CAST(v.created_at as date) >= :end_date', {
-        end_date: query_params.end_date,
-      });
-      query.andWhere('CAST(p.created_at as date) >= :start_date', {
-        start_date: query_params.end_date,
-      });
+      query.orWhere(
+        'CAST(v.created_at as date) BETWEEN :start_date AND :end_date',
+        {
+          start_date: query_params.start_date,
+          end_date: query_params?.end_date,
+        },
+      );
+      query.orWhere(
+        'CAST(p.created_at as date) BETWEEN :start_date AND :end_date',
+        {
+          start_date: query_params.start_date,
+          end_date: query_params?.end_date,
+        },
+      );
     }
     const data = await query.getRawOne();
     return data;

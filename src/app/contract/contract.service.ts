@@ -1,3 +1,4 @@
+import { response } from 'express';
 import {
   ConflictException,
   Injectable,
@@ -12,6 +13,8 @@ import { UpdateContractDto } from './dto/update-contract.dto';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import { Alerts } from 'src/constants/alerts';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
+import { NotesEntity } from '../notes/entities/notes.entity';
+import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';
 
 @Injectable()
 export default class ContractService {
@@ -21,7 +24,8 @@ export default class ContractService {
     private dataSource: DataSource,
   ) {}
 
-  public async CreateContract(body: CreateContractDto) {
+  public async CreateContract(data: CreateContractDto) {
+    const { note = '', ...body } = data;
     const query_runner = this.dataSource.createQueryRunner();
     await query_runner.startTransaction();
     try {
@@ -33,12 +37,27 @@ export default class ContractService {
       if (contractExists) {
         throw new ConflictException('Contract Exists');
       }
-
       const mapped_contract = plainToInstance(ContractEntity, body);
-      const response = await query_runner.manager.save(mapped_contract);
-      const alert = await query_runner.manager.findOne(AlertsEntity, {
-        where: { name: Alerts.MISSING_DEAL },
-      });
+      const query_promises: (
+        | Promise<ContractEntity>
+        | Promise<AlertsEntity>
+        | Promise<NotesEntity>
+      )[] = [
+        query_runner.manager.save(mapped_contract),
+        query_runner.manager.findOne(AlertsEntity, {
+          where: { name: Alerts.MISSING_DEAL },
+          loadEagerRelations: false,
+        }),
+      ];
+
+      if (note !== '' && note !== undefined && note !== null) {
+        query_promises.push(
+          query_runner.manager.save(
+            plainToInstance(NotesEntity, { body: note }),
+          ),
+        );
+      }
+      const [contract, alert, ...result] = await Promise.all(query_promises);
       const missing_deal_alert = await query_runner.manager.findOne(
         BusinessChannelAlertsEntity,
         {
@@ -50,11 +69,20 @@ export default class ContractService {
         },
       );
 
+      if (result.length > 0) {
+        await query_runner.manager.save(
+          plainToInstance(BusinessChannelNotesEntity, {
+            business_channel_id: body.business_channel_id,
+            note_id: result[0].id,
+          }),
+        );
+      }
+
       if (missing_deal_alert) {
         await missing_deal_alert.softRemove();
       }
       await query_runner.commitTransaction();
-      return response;
+      return contract;
     } catch (error) {
       await query_runner.rollbackTransaction();
       throw error;

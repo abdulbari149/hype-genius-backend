@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Validate,
 } from 'class-validator';
@@ -42,6 +43,10 @@ export class CreateContractDto {
     message: CURRENCY_NOT_FOUND,
   })
   currency_id: number;
+
+  @IsString()
+  @IsOptional()
+  note?: string;
 
   @IsNumber()
   @IsNotEmpty()
