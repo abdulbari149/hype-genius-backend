@@ -16,9 +16,10 @@ export class AppController {
     private jwtService: JwtService,
   ) {}
 
+  @Public()
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  index() {
+    return this.appService.index();
   }
 
   @Public()

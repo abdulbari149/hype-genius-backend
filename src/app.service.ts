@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import BusinessEntity from './app/business/entities/business.entity';
+import ResponseEntity from './helpers/ResponseEntity';
 
 type IsURLType<T> = [true, T] | [false, null];
 
@@ -13,8 +14,8 @@ export class AppService {
     private configService: ConfigService,
   ) {}
 
-  getHello(): string {
-    return 'Hello World!';
+  index(): ResponseEntity<null> {
+    return new ResponseEntity(null, 'Hypegenius Backend Is Working Fine!!!');
   }
 
   public async isBusinesOnboardingURL(
