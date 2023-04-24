@@ -28,11 +28,11 @@ export default class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   @IsStrongPassword({
-    minLength: 8,
-    minLowercase: 2,
-    minNumbers: 2,
-    minSymbols: 1,
-    minUppercase: 1,
+    minLength: 6,
+    minLowercase: 0,
+    minNumbers: 0,
+    minUppercase: 0,
+    minSymbols: 0,
   })
   public password: string;
 }
