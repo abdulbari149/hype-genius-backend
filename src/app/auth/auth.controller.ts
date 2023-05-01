@@ -109,6 +109,23 @@ export default class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @Get('channel/:token/verify')
+  async validateChannelToken(@Param('token') token: string) {
+    const payload = await this.authService.validateToken<{
+      businessId: number;
+      onboardingId?: number;
+    }>(token, this.configService.get('jwt.onboarding_first.secret'));
+
+    const business = await this.businessService.getBusiness(payload.businessId);
+    return new ResponseEntity(
+      { name: business.name },
+      'The token is valid',
+      HttpStatus.OK,
+    );
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
   @Get('/onboarding/:token')
   async getPartnerShips(@Param('token') token: string) {
     const payload = await this.authService.validateSecondOnboardingToken(token);

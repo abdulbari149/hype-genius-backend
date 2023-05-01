@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/public.decorator';
 import { URL } from 'url';
+import BusinessEntity from './app/business/entities/business.entity';
 
 @Controller()
 export class AppController {
@@ -36,9 +37,10 @@ export class AppController {
       this.appService.isBusinesOnboardingURL(code),
       this.appService.isOnboardingRequestURL(code),
     ]);
-    let payload = {};
+    let payload: Partial<{ businessId: number; onboardingId?: number }>;
     if (isBusinessURL) payload = businessPayload;
     else if (isOnboardingURL) payload = onboardingPayload;
+    else payload = {};
 
     const secret = this.configService.getOrThrow('jwt.onboarding_first.secret');
     const expiresIn = this.configService.getOrThrow(
@@ -52,7 +54,7 @@ export class AppController {
     const url = new URL(
       `${this.configService.get('app.frontendDomain')}/auth/signup/channel`,
     );
-    url.searchParams.set('token', token);
+    url.searchParams.set('token', encodeURIComponent(token));
     console.log(url.toString());
     res.redirect(url.toString());
   }

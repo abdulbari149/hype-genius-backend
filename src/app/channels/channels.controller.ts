@@ -1,9 +1,18 @@
-import { Controller, Post, Put, Body, Get, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Put,
+  Body,
+  Get,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { Payload } from 'src/decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import ChannelService from './channels.service';
 import ResponseEntity from 'src/helpers/ResponseEntity';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
+import GetAnalyticsQueryDto from './dto/get-analytics-query.dto';
 
 @Controller({
   path: '/channels',
@@ -31,8 +40,14 @@ export default class ChannelController {
   }
 
   @Get('/analytics')
-  async getChannelAnalytics(@Payload() payload: JwtAccessPayload) {
-    const result = await this.channelService.getChannelAnalytics(payload);
+  async getChannelAnalytics(
+    @Query() query: GetAnalyticsQueryDto,
+    @Payload() payload: JwtAccessPayload,
+  ) {
+    const result = await this.channelService.getChannelAnalytics(
+      payload,
+      query,
+    );
     console.log(result);
     return new ResponseEntity(result);
   }

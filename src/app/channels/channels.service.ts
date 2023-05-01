@@ -10,6 +10,7 @@ import BusinessChannelEntity from '../business/entities/business.channel.entity'
 import { BusinessResponse } from '../business/dto/business-response.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import { ContractResponseDto } from '../contract/dto/contract-response.dto';
+import GetAnalyticsQueryDto from './dto/get-analytics-query.dto';
 @Injectable()
 export default class ChannelService {
   constructor(
@@ -21,7 +22,10 @@ export default class ChannelService {
     private businessChannelRepository: Repository<BusinessChannelEntity>,
   ) {}
 
-  public async getChannelAnalytics(payload: JwtAccessPayload) {
+  public async getChannelAnalytics(
+    payload: JwtAccessPayload,
+    query: GetAnalyticsQueryDto,
+  ) {
     const where = {
       userId: payload.user_id,
       channelId: payload.channel_id,
@@ -40,6 +44,13 @@ export default class ChannelService {
       .createQueryBuilder('bc')
       .innerJoinAndSelect('bc.contract', 'c')
       .where('bc.user_id=:userId and bc.channel_id=:channelId', where);
+
+    if (query.start_date && query.end_date) {
+      videoQuery.andWhere(
+        'cast(v.created_at as date) BETWEEN :start_date and :end_date',
+        { start_date: query.start_date, end_date: query.end_date },
+      );
+    }
     const [videoData, contractData] = await Promise.all([
       videoQuery.getRawOne(),
       contractQuery.getMany(),
