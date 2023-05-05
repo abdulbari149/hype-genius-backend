@@ -483,15 +483,8 @@ export default class BusinessService {
       query_params?.end_date &&
       typeof query_params?.end_date !== 'undefined'
     ) {
-      query.orWhere(
+      query.andWhere(
         'CAST(v.created_at as date) BETWEEN :start_date AND :end_date',
-        {
-          start_date: query_params.start_date,
-          end_date: query_params?.end_date,
-        },
-      );
-      query.orWhere(
-        'CAST(p.created_at as date) BETWEEN :start_date AND :end_date',
         {
           start_date: query_params.start_date,
           end_date: query_params?.end_date,
