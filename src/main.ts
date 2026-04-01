@@ -5,7 +5,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import validationOptions from './utils/validation-options';
 import { SerializerInterceptor } from './utils/serializer.interceptor';
 import { useContainer } from 'class-validator';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
