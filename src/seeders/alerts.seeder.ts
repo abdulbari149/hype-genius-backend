@@ -35,9 +35,16 @@ export class AlertsSeeder implements Seeder {
 
     const query_runner = dataSource.createQueryRunner();
     try {
+      await query_runner.connect();
       await query_runner.startTransaction();
-      const alerts_entity = plainToInstance(AlertsEntity, alerts);
-      query_runner.manager.save(alerts_entity);
+      for (const a of alerts) {
+        const exists = await query_runner.manager.findOne(AlertsEntity, {
+          where: { name: a.name },
+        });
+        if (!exists) {
+          await query_runner.manager.save(plainToInstance(AlertsEntity, a));
+        }
+      }
       await query_runner.commitTransaction();
     } catch (error) {
       await query_runner.rollbackTransaction();

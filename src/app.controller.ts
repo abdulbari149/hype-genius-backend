@@ -1,12 +1,23 @@
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Inject,
+  Param,
+  Req,
+  Res,
+  Version,
+  VERSION_NEUTRAL,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { Public } from './decorators/public.decorator';
 import { URL } from 'url';
-import BusinessEntity from './app/business/entities/business.entity';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Controller()
 export class AppController {
@@ -15,6 +26,7 @@ export class AppController {
     private dataSource: DataSource,
     private configService: ConfigService,
     private jwtService: JwtService,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   @Public()
@@ -24,7 +36,52 @@ export class AppController {
   }
 
   @Public()
-  @Get('/:code')
+  @Get('health')
+  async health(
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{
+    status: string;
+    database: { status: string };
+    redis: { status: string };
+  }> {
+    const [dbOk, redisOk] = await Promise.all([
+      this.checkDatabase(),
+      this.checkRedis(),
+    ]);
+    const healthy = dbOk && redisOk;
+    res.status(healthy ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE);
+    return {
+      status: healthy ? 'ok' : 'error',
+      database: { status: dbOk ? 'up' : 'down' },
+      redis: { status: redisOk ? 'up' : 'down' },
+    };
+  }
+
+  private async checkDatabase(): Promise<boolean> {
+    try {
+      await this.dataSource.query('SELECT 1');
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async checkRedis(): Promise<boolean> {
+    const key = '__health_check__';
+    try {
+      await this.cacheManager.set(key, 'ok', 1_000);
+      const got = await this.cacheManager.get<string>(key);
+      await this.cacheManager.del(key);
+      return got === 'ok';
+    } catch {
+      return false;
+    }
+  }
+
+  /** Public onboarding at `GET /r/:code` (no /api prefix) — see main.ts globalPrefix exclude. */
+  @Version(VERSION_NEUTRAL)
+  @Public()
+  @Get('r/:code')
   async handleOnboardingURL(
     @Param('code') code: string,
     @Req() req: Request,

@@ -1,6 +1,7 @@
 import { IsMultipleExist } from './utils/validators/is-multiple-exist.validator';
 import { JwtHelperService } from './helpers/jwt-helper.service';
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';

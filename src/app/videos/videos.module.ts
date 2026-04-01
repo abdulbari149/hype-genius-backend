@@ -14,7 +14,7 @@ import { VideoNotificationService } from './videos.event';
     forwardRef(() => UserModule),
   ],
   controllers: [VideosController],
-  providers: [VideosService, IsExist, VideoNotificationService],
+  providers: [VideosService, VideoNotificationService],
   exports: [VideosService],
 })
 export default class VideosModule {}

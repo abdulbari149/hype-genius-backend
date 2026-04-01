@@ -75,7 +75,7 @@ export default class ChannelService {
         .fill(0)
         .map(() => Math.floor(Math.random() * 100).toString(16))
         .join('');
-      link = `${process.env.BACKEND_DOMAIN}/${code}`;
+      link = `${process.env.BACKEND_DOMAIN}/r/${code}`;
       const onboardRequests = await this.onboardRequestsRepository.findOne({
         where: { link },
       });

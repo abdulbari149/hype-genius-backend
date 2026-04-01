@@ -36,13 +36,18 @@ export class AppService {
   public async isOnboardingRequestURL(
     code: string,
   ): Promise<IsURLType<{ businessId: number; onboardingId: number }>> {
-    const onboardingLink = `${this.configService.get(
-      'app.backendDomain',
-    )}/${code}`;
+    const base = this.configService.get<string>('app.backendDomain');
+    const onboardingLink = `${base}/r/${code}`;
+    const legacyRootLink = `${base}/${code}`;
+    const legacyInviteLink = `${base}/api/v1/invite/${code}`;
     const onboarding_request = await this.dataSource
       .getRepository(OnboardRequestsEntity)
       .findOne({
-        where: { link: onboardingLink },
+        where: [
+          { link: onboardingLink },
+          { link: legacyRootLink },
+          { link: legacyInviteLink },
+        ],
       });
 
     if (!onboarding_request) return [false, null];

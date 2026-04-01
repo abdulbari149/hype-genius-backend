@@ -1,6 +1,8 @@
 import { resolve } from 'path';
 import { config } from 'dotenv';
-const envFilePath = resolve(__dirname, `../env/${process.env.NODE_ENV}.env`);
+
+const root = process.cwd();
+const envFilePath = resolve(root, '.env');
 
 config({
   path: envFilePath,
@@ -15,4 +17,9 @@ module.exports = {
   migrations: ['src/migrations/*{.ts,.js}'],
   entities: ['src/app/**/*.entity.{ts,js}'],
   seeds: ['src/seeders/*.seeder{.ts,.js}'],
+  ssl: {
+    rejectUnauthorized: false,
+  },
+  logging: true,
+  
 };

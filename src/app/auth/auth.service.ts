@@ -166,9 +166,10 @@ export default class AuthService {
     const query_runner = this.dataSource.createQueryRunner();
     try {
       await query_runner.startTransaction();
+      const slug = data.businessName.replace(' ', '').trim();
       const onboardingLink = `${this.configService.get(
         'app.backendDomain',
-      )}/${data.businessName.replace(' ', '').trim()}`;
+      )}/r/${slug}`;
       const {
         data: { user, role },
         error,

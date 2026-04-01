@@ -99,6 +99,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
     }
     const url = create_dynamic_api_url(params, originalUrl);
+    console.log(url);
     const permissions = await this.getRolePermissions(payload.role);
     if (!permissions.some((p) => p.end_point === url)) {
       throw new ForbiddenException(FORBIDDEN);

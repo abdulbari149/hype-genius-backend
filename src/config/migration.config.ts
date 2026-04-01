@@ -1,13 +1,14 @@
 import { resolve } from 'path';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-const envFilePath = resolve(__dirname, `../../env/${process.env.NODE_ENV}.env`);
-console.log(envFilePath);
+
+/** Paths assume CLI is run from the backend package root (e.g. `npm run migration:up`). */
+const root = process.cwd();
+
+const envFilePath = resolve(root, '.env');
 config({
   path: envFilePath,
 });
-
-console.log(process.env);
 
 export const app_data_source = new DataSource({
   type: 'postgres',
@@ -16,7 +17,12 @@ export const app_data_source = new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  entities: [resolve(__dirname, '../app/**/**/*.entity{.ts,.js}')],
+  entities: [resolve(root, 'src/app/**/**/*.entity{.ts,.js}')],
   migrations: ['src/migrations/*.{ts,js}'],
+  ssl: {
+    rejectUnauthorized: false,
+  },
+  logging: true,
+  
 });
 app_data_source.initialize();

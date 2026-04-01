@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { RequestMethod, ValidationPipe, VersioningType } from '@nestjs/common';
 import validationOptions from './utils/validation-options';
 import { SerializerInterceptor } from './utils/serializer.interceptor';
 import { useContainer } from 'class-validator';
@@ -12,6 +12,7 @@ async function bootstrap() {
   const config = await app.resolve(ConfigService);
   app.enableVersioning({
     type: VersioningType.URI,
+    defaultVersion: '1',
   });
 
   app.enableCors({
@@ -25,8 +26,11 @@ async function bootstrap() {
   app.useGlobalInterceptors(new SerializerInterceptor());
   app.useGlobalPipes(new ValidationPipe(validationOptions));
 
+  // Do not use '/:business' here: it matches any single path segment (e.g. "videos"),
+  // which strips the global prefix from those routes and breaks /api/v1/videos.
+  // Onboarding lives at /r/:code (VERSION_NEUTRAL) — exclude only that pattern.
   app.setGlobalPrefix(config.get('app.prefix'), {
-    exclude: ['/', '/:business'],
+    exclude: ['/', { path: 'r/:code', method: RequestMethod.GET }],
   });
   const port = process.env.PORT ?? config.get('app.port');
   await app.listen(port);
