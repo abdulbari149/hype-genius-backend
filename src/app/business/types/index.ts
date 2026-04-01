@@ -1,5 +1,5 @@
-import ChannelEntity from 'src/app/channels/entities/channels.entity';
-import UserEntity from 'src/app/users/entities/user.entity';
+import ChannelEntity from '../../channels/entities/channels.entity';
+import UserEntity from '../../users/entities/user.entity';
 
 type BaseKeys = 'id' | 'createdAt' | 'updatedAt' | 'deletedAt';
 

@@ -14,10 +14,10 @@ import {
   IsArray,
   ValidateNested,
 } from 'class-validator';
-import { CreateTagsDto } from 'src/app/tags/dto/create-tags.dto';
-import { MESSAGES } from 'src/common/messages';
-import { UploadFrequencies } from 'src/constants/upload_frequencies';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { CreateTagsDto } from '../../tags/dto/create-tags.dto';
+import { MESSAGES } from '../../../common/messages';
+import { UploadFrequencies } from '../../../constants/upload_frequencies';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
 
 const {
   CURRENCY: {

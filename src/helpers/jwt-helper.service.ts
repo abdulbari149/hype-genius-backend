@@ -1,7 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ResponseMessage } from 'src/common/messages';
+import { ResponseMessage } from '../common/messages';
 import { JwtAccessPayload } from '../app/auth/auth.interface';
 
 const { SERVER_ERROR } = ResponseMessage;

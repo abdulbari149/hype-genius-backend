@@ -5,8 +5,8 @@ import {
   IsPositive,
   Validate,
 } from 'class-validator';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
-import { MESSAGES } from 'src/common/messages';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
+import { MESSAGES } from '../../../common/messages';
 const {
   CURRENCY: {
     ERROR: { CURRENCY_NOT_FOUND },

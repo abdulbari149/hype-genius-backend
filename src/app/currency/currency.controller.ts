@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import CurrencyService from './curreny.service';
-import ResponseEntity from 'src/helpers/ResponseEntity';
-import { Public } from 'src/decorators/public.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
+import { Public } from '../../decorators/public.decorator';
 
 @Controller({
   version: '1',

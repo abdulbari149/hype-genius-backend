@@ -13,8 +13,8 @@ import {
 import { CreateTagsDto } from './dto/create-tags.dto';
 import TagsService from './tags.service';
 import { JwtAccessPayload } from '../auth/auth.interface';
-import { Payload } from 'src/decorators/payload.decorator';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import { Payload } from '../../decorators/payload.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import { SaveTagsDto } from './dto/save-tags.dto';
 import { DataSource } from 'typeorm';
 

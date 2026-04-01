@@ -19,10 +19,10 @@ import ContractEntity from '../contract/entities/contract.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import { VideoNotificationService, VideoUploadEvent } from './videos.event';
-import { Alerts } from 'src/constants/alerts';
+import { Alerts } from '../../constants/alerts';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import BusinessChannelAlertVideoEntity from './entities/business_channel_video_alert.entity';
-import ROLES from 'src/constants/roles';
+import ROLES from '../../constants/roles';
 import { GetVideosQueryDto } from './dto/get-videos-query.dto';
 
 @Injectable()

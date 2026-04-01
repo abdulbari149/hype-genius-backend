@@ -7,10 +7,10 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { Payload } from 'src/decorators/payload.decorator';
+import { Payload } from '../../decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import ChannelService from './channels.service';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
 import GetAnalyticsQueryDto from './dto/get-analytics-query.dto';
 

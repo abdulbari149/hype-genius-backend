@@ -7,9 +7,9 @@ import {
   Query,
 } from '@nestjs/common';
 import { AlertsService } from './alerts.service';
-import { Payload } from 'src/decorators/payload.decorator';
+import { Payload } from '../../decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 
 @Controller({
   path: 'alerts',

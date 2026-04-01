@@ -8,7 +8,7 @@ import { RoutesEntity } from './entities/route.entity';
 import { RoutesController } from './routes.controller';
 import { RoutesRepository } from './routes.repository';
 import { RoutesService } from './routes.service';
-import { CacheService } from 'src/helpers/CacheService';
+import { CacheService } from '../../helpers/CacheService';
 
 @Module({
   imports: [

@@ -1,8 +1,8 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { CreateContractDto } from './create-contract.dto';
 import { IsNumber, IsNotEmpty, Validate } from 'class-validator';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
-import { MESSAGES } from 'src/common/messages';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
+import { MESSAGES } from '../../../common/messages';
 
 const {
   BUSINESS_CHANNELS: {

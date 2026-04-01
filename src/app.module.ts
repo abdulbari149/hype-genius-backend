@@ -1,5 +1,5 @@
 import { IsMultipleExist } from './utils/validators/is-multiple-exist.validator';
-import { JwtHelperService } from 'src/helpers/jwt-helper.service';
+import { JwtHelperService } from './helpers/jwt-helper.service';
 import { CacheModule, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -36,11 +36,10 @@ import { AlertsModule } from './app/alerts/alerts.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import PaymentsModule from './app/payments/payments.module';
-import { RolesSeeder } from './seeders/roles_and_routes.seeder';
 
 const envFilePath = path.resolve(
   __dirname,
-  `../env/${process.env.NODE_ENV}.env`,
+  '../.env'
 );
 /** Vercel injects env vars in the dashboard; no env file is present in the bundle. */
 const isVercel = process.env.VERCEL === '1';

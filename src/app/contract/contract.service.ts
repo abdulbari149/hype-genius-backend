@@ -1,4 +1,3 @@
-import { response } from 'express';
 import {
   ConflictException,
   Injectable,
@@ -11,7 +10,7 @@ import { CreateContractDto } from './dto/create-contract.dto';
 import { plainToInstance } from 'class-transformer';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
-import { Alerts } from 'src/constants/alerts';
+import { Alerts } from '../../constants/alerts';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import { NotesEntity } from '../notes/entities/notes.entity';
 import { BusinessChannelNotesEntity } from '../notes/entities/business_channel_notes.entity';

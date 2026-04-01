@@ -15,13 +15,13 @@ import {
   Response,
 } from '@nestjs/common';
 import AuthService from './auth.service';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import AuthRegisterBusinessDto from './dto/auth-register-business.dto';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
 import { Request, Response as ExpressResponse, response } from 'express';
 import UserEntity from '../users/entities/user.entity';
-import { Public } from 'src/decorators/public.decorator';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { Public } from '../../decorators/public.decorator';
+import { CurrentUser } from '../../decorators/current-user.decorator';
 import AuthMeResponse from './dto/auth-me-response.dto';
 import ChannelService from '../channels/channels.service';
 import BusinessService from '../business/business.service';

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import ContractService from './contract.service';
 import { CreateContractDto } from './dto/create-contract.dto';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import { UpdateContractDto } from './dto/update-contract.dto';
 @Controller({
   path: '/contracts',

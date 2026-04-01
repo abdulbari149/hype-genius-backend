@@ -1,5 +1,5 @@
 import { CustomRequest } from './../types/index';
-import UserEntity from 'src/app/users/entities/user.entity';
+import UserEntity from '../app/users/entities/user.entity';
 import { RoleRepository } from './../app/roles/role.repository';
 import {
   ForbiddenException,
@@ -13,10 +13,10 @@ import { CacheService } from '../helpers/CacheService';
 import { ResponseMessage } from '../common/messages';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { JwtAccessPayload } from 'src/app/auth/auth.interface';
+import { JwtAccessPayload } from '../app/auth/auth.interface';
 import { InjectRepository } from '@nestjs/typeorm';
-import BusinessEntity from 'src/app/business/entities/business.entity';
-import ChannelEntity from 'src/app/channels/entities/channels.entity';
+import BusinessEntity from '../app/business/entities/business.entity';
+import ChannelEntity from '../app/channels/entities/channels.entity';
 
 interface JWTPayloadWithExp extends JwtAccessPayload {
   iat: number;

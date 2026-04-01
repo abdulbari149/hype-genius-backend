@@ -1,5 +1,5 @@
 import { IsBoolean, IsNumber, IsString, Validate } from 'class-validator';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
 import { MESSAGES } from '../../../common/messages';
 const {
   BUSINESS_CHANNELS: {

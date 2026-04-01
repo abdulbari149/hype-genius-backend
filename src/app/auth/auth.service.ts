@@ -15,14 +15,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { AuthEmailLoginDto } from './dto/auth-email-login.dto';
-import { Comparepassword } from 'src/helpers/UtilHelper';
+import { Comparepassword } from '../../helpers/UtilHelper';
 import { MESSAGES } from '../../common/messages';
-import { JwtHelperService } from 'src/helpers/jwt-helper.service';
+import { JwtHelperService } from '../../helpers/jwt-helper.service';
 import AuthRegisterBusinessDto from './dto/auth-register-business.dto';
 import { hash } from 'bcryptjs';
 import { plainToInstance } from 'class-transformer';
 import BusinessEntity from '../business/entities/business.entity';
-import ROLES from 'src/constants/roles';
+import ROLES from '../../constants/roles';
 import AuthRegisterChannelDto from './dto/auth-register-channel.dto';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -32,7 +32,7 @@ import CreateUserDto from '../users/dto/create-user.dto';
 import { JwtAccessPayload } from './auth.interface';
 import AuthRegisterChannelResponse from './dto/auth-register-channel.response.dto';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
-import { Alerts } from 'src/constants/alerts';
+import { Alerts } from '../../constants/alerts';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';
 import OnboardRequestsEntity, {
   OnboardRequestsData,

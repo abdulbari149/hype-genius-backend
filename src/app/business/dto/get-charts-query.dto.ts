@@ -1,5 +1,5 @@
 import { Validate, IsOptional } from 'class-validator';
-import { IsOnlyDate } from 'src/utils/validators/is-only-date.validator';
+import { IsOnlyDate } from '../../../utils/validators/is-only-date.validator';
 
 export class GetChartsDataQueryDto {
   @Validate(IsOnlyDate)

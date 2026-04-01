@@ -1,4 +1,4 @@
-import { Payload } from 'src/decorators/payload.decorator';
+import { Payload } from '../../decorators/payload.decorator';
 import {
   Body,
   Controller,
@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateBusinessChannelNotesDto } from './dto/create-notes.dto';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import { JwtAccessPayload } from '../auth/auth.interface';
 @Controller({
   path: 'notes',

@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import CreateUserDto from './dto/create-user.dto';
 import { RoleEntity } from '../roles/entities/role.entity';
 import { hash } from 'bcryptjs';
-import ROLES from 'src/constants/roles';
+import ROLES from '../../constants/roles';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()

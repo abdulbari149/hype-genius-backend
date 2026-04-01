@@ -5,7 +5,7 @@ import VideosController from './videos.controller';
 import VideosService from './videos.service';
 import UserModule from '../users/user.module';
 import UserEntity from '../users/entities/user.entity';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { IsExist } from '../../utils/validators/is-exists.validator';
 import { VideoNotificationService } from './videos.event';
 
 @Module({

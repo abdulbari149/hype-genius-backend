@@ -1,5 +1,5 @@
 import { CustomRequest } from './../../types/index';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import ResponseEntity from '../../helpers/ResponseEntity';
 import {
   Controller,
   HttpCode,
@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { CreateVideoDto } from './dto/create-video.dto';
 import VideosService from './videos.service';
-import { Payload } from 'src/decorators/payload.decorator';
+import { Payload } from '../../decorators/payload.decorator';
 import { FindOptionsWhere } from 'typeorm';
 import AddNoteDto from './dto/add-note.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';

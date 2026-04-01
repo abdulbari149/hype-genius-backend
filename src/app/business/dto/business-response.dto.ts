@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { CurrencyResponse } from 'src/app/currency/dto/currency-response.dto';
+import { CurrencyResponse } from '../../currency/dto/currency-response.dto';
 
 @Exclude({ toClassOnly: true })
 export class BusinessResponse {

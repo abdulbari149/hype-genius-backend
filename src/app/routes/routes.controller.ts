@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { RoutesService } from './routes.service';
 import { CreateRoutesDto } from './dto/create-routes.dto';
-import { Public } from 'src/decorators/public.decorator';
-import ResponseEntity from 'src/helpers/ResponseEntity';
+import { Public } from '../../decorators/public.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
 
 @Controller({
   path: 'routes',

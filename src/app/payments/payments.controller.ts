@@ -1,8 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import PaymentsService from './payments.service';
 import { CreatePaymentsDto } from './dto/create-payments.dto';
-import ResponseEntity from 'src/helpers/ResponseEntity';
-import { Payload } from 'src/decorators/payload.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
+import { Payload } from '../../decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
 
 @Controller({

@@ -5,7 +5,7 @@ import UserController from './user.controller';
 import UserService from './user.service';
 import { RolesModule } from '../roles/roles.module';
 import { RoleEntity } from '../roles/entities/role.entity';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { IsExist } from '../../utils/validators/is-exists.validator';
 
 @Module({
   imports: [

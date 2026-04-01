@@ -5,7 +5,7 @@ import ChannelEntity from './entities/channels.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import OnboardRequestsEntity from './entities/onboard_requests.entity';
 import { UpdateOnboardingDto } from './dto/update-onboarding.dto';
-import { pick } from 'src/utils/pick';
+import { pick } from '../../utils/pick';
 import BusinessChannelEntity from '../business/entities/business.channel.entity';
 import { BusinessResponse } from '../business/dto/business-response.dto';
 import { JwtAccessPayload } from '../auth/auth.interface';

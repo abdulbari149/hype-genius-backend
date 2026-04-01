@@ -9,8 +9,8 @@ import {
 } from '@nestjs/common';
 import UserService from './user.service';
 import CreateUserDto from './dto/create-user.dto';
-import ResponseEntity from 'src/helpers/ResponseEntity';
-import { Payload } from 'src/decorators/payload.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
+import { Payload } from '../../decorators/payload.decorator';
 import { JwtAccessPayload } from '../auth/auth.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 

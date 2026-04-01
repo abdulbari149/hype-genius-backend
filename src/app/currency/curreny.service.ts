@@ -1,4 +1,4 @@
-import CurrencyEntity from 'src/app/currency/entities/currency.entity';
+import CurrencyEntity from './entities/currency.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

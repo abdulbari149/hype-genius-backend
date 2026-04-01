@@ -7,7 +7,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import ContractEntity from '../contract/entities/contract.entity';
 import moment from 'moment';
-import { Alerts } from 'src/constants/alerts';
+import { Alerts } from '../../constants/alerts';
 import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import { number } from 'joi';
 import { BusinessChannelAlertsEntity } from '../alerts/entities/business_channel_alerts.entity';

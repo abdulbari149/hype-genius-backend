@@ -19,8 +19,9 @@ export default class DatabaseProvider implements TypeOrmOptionsFactory {
       synchronize: this.configService.get('database.sync'),
       connectTimeoutMS: 5000,
       ssl: this.configService.get('database.ssl')
-        ? { rejectUnauthorized: false }
+        ? { rejectUnauthorized: false, }
         : false,
+      channelBinding: 'require',
       logging: true,
       maxQueryExecutionTime: 2000,
       poolSize: this.configService.get('database.poolMax'),

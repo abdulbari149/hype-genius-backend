@@ -14,8 +14,8 @@ import {
   Req,
 } from '@nestjs/common';
 import BusinessService from './business.service';
-import ResponseEntity from 'src/helpers/ResponseEntity';
-import { Payload } from 'src/decorators/payload.decorator';
+import ResponseEntity from '../../helpers/ResponseEntity';
+import { Payload } from '../../decorators/payload.decorator';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';
 import { GetMetricsQueryDto } from './dto/get-metrics-query.dto';

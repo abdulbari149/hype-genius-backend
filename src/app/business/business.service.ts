@@ -16,7 +16,7 @@ import { AlertsEntity } from '../alerts/entities/alerts.entity';
 import TagsEntity from '../tags/entities/tags.entity';
 import ContractEntity from '../contract/entities/contract.entity';
 import { AlertType, BusinessChannelType, TagType } from './types';
-import { Alerts } from 'src/constants/alerts';
+import { Alerts } from '../../constants/alerts';
 import { UpdateBusinessDto } from './dto/update-business.dto';
 import VideosEntity from '../videos/entities/videos.entity';
 import { GetBusinessReportQueryDto } from './dto/get-business-report-query.dto';

@@ -1,5 +1,5 @@
 import { Exclude, Expose, Type } from 'class-transformer';
-import { BusinessResponse } from 'src/app/business/dto/business-response.dto';
+import { BusinessResponse } from '../../business/dto/business-response.dto';
 import AuthRegisterResponse from './auth-register-response.dto';
 
 @Exclude({ toClassOnly: true })

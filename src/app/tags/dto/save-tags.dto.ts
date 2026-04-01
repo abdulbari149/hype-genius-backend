@@ -9,7 +9,7 @@ import {
   IsNumber,
 } from 'class-validator';
 import { CreateTagsDto } from './create-tags.dto';
-import { IsExist } from 'src/utils/validators/is-exists.validator';
+import { IsExist } from '../../../utils/validators/is-exists.validator';
 
 class NewTagDto extends OmitType(CreateTagsDto, ['business_channel_id']) {}
 class OldTagDto extends NewTagDto {
