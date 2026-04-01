@@ -42,11 +42,14 @@ const envFilePath = path.resolve(
   __dirname,
   `../env/${process.env.NODE_ENV}.env`,
 );
+/** Vercel injects env vars in the dashboard; no env file is present in the bundle. */
+const isVercel = process.env.VERCEL === '1';
 @Module({
   imports: [
     ConfigModule.forRoot({
       cache: true,
-      envFilePath,
+      ignoreEnvFile: isVercel,
+      envFilePath: isVercel ? undefined : envFilePath,
       load: [databaseConfig, appConfig, jwtConfig, cacheConfig],
       isGlobal: true,
       validationSchema: envValidationSchema,
@@ -82,7 +85,6 @@ const envFilePath = path.resolve(
     CurrencyModule,
     NotesModule,
     AlertsModule,
-    ScheduleModule.forRoot(),
     PaymentsModule,
   ],
   controllers: [AppController],

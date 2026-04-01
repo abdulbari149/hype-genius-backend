@@ -28,6 +28,7 @@ async function bootstrap() {
   app.setGlobalPrefix(config.get('app.prefix'), {
     exclude: ['/', '/:business'],
   });
-  await app.listen(config.get('app.port'));
+  const port = process.env.PORT ?? config.get('app.port');
+  await app.listen(port);
 }
 bootstrap();

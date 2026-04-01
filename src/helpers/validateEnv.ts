@@ -6,6 +6,10 @@ const envValidationSchema = joi.object().keys({
   DB_USER: joi.string().required(),
   DB_PASS: joi.string().required(),
   DB_NAME: joi.string().required(),
+  /** Set to "true" for Supabase / managed Postgres (TLS). Omit or "false" for local Docker. */
+  DB_SSL: joi.string().valid('true', 'false').optional(),
+  /** Connection pool max (use a small value on Vercel, e.g. 5). */
+  DB_POOL_MAX: joi.number().optional(),
   DB_SYNC: joi.boolean().required(),
   PORT: joi.number().required(),
   API_PREFIX: joi.string().required(),

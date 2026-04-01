@@ -18,10 +18,12 @@ export default class DatabaseProvider implements TypeOrmOptionsFactory {
       entities: [resolve(__dirname, '../app/**/**/entities/*.entity.{ts,js}')],
       synchronize: this.configService.get('database.sync'),
       connectTimeoutMS: 5000,
-      ssl: false,
+      ssl: this.configService.get('database.ssl')
+        ? { rejectUnauthorized: false }
+        : false,
       logging: true,
       maxQueryExecutionTime: 2000,
-      poolSize: 1024,
+      poolSize: this.configService.get('database.poolMax'),
     });
   }
 }

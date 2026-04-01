@@ -7,4 +7,6 @@ export default registerAs('database', () => ({
   password: process.env.DB_PASS,
   sync: process.env.DB_SYNC == 'true' ? true : false,
   name: process.env.DB_NAME,
+  ssl: process.env.DB_SSL === 'true',
+  poolMax: parseInt(process.env.DB_POOL_MAX || '10', 10) || 10,
 }));
